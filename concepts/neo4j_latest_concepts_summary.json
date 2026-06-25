@@ -1,0 +1,32 @@
+{
+  "node_count": 293,
+  "relationship_count": 632,
+  "label_breakdown": {
+    "ProgrammingLanguage": 2,
+    "PedagogicalView": 6,
+    "ConceptCategory": 20,
+    "LibraryModule": 28,
+    "Header": 43,
+    "ProgrammingConcept": 185,
+    "KnowledgePoint": 9
+  },
+  "relationship_breakdown": {
+    "SUBCATEGORY_OF": 18,
+    "MODULE_OF": 28,
+    "HEADER_OF": 43,
+    "BELONGS_TO": 127,
+    "IMPLEMENTED_IN": 185,
+    "BELONGS_TO_MODULE": 58,
+    "DECLARED_IN": 58,
+    "SPECIALIZES": 7,
+    "PREREQUISITE_OF": 45,
+    "VISIBLE_IN": 53,
+    "HAS_KNOWLEDGE_POINT": 10
+  },
+  "files": [
+    "neo4j_latest_concepts_nodes.csv",
+    "neo4j_latest_concepts_relationships.csv",
+    "neo4j_latest_concepts_seed.cypher",
+    "generate_neo4j_latest_concepts_dataset.py"
+  ]
+}

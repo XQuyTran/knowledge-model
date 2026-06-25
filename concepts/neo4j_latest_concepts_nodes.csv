@@ -1,0 +1,294 @@
+category,description,difficulty,family,id,isModern,kind,label,language,name,standardVersion,status
+,"C language, latest baseline snapshot focused on C23",,C,lang.c,true,,ProgrammingLanguage,,C,C23,active
+,"C++ language, latest baseline snapshot focused on C++23",,C++,lang.cpp,true,,ProgrammingLanguage,,C++,C++23,active
+,Introductory C programming,,,view.intro_c,true,,PedagogicalView,,IntroC,,active
+,C pointers and memory management,,,view.c_pointers,true,,PedagogicalView,,PointersAndMemoryInC,,active
+,Object-oriented programming in C++,,,view.cpp_oop,true,,PedagogicalView,,OOPInCpp,,active
+,Modern C++ practices focused on C++23,,,view.cpp_modern,true,,PedagogicalView,,ModernCpp,,active
+,"C++ templates, STL, ranges, and algorithms",,,view.cpp_stl,true,,PedagogicalView,,TemplatesAndSTL,,active
+,Algorithms and data structures across C/C++,,,view.algorithms,true,,PedagogicalView,,AlgorithmsAndDSA,,active
+,top-level category for C core language concepts,,,cat.c.core,true,,ConceptCategory,C,C Core Language,latest,active
+,"Identifiers, scope, lifetime, objects, memory model, and undefined behavior",,,cat.c.basic,true,,ConceptCategory,C,C Basic Concepts,latest,active
+,Directives and macro processing,,,cat.c.preprocessor,true,,ConceptCategory,C,C Preprocessor,latest,active
+,Control-flow and jump statements,,,cat.c.statements,true,,ConceptCategory,C,C Statements,latest,active
+,"Operators, conversions, literals, and expression forms",,,cat.c.expressions,true,,ConceptCategory,C,C Expressions,latest,active
+,"Types, declarations, storage, qualifiers, and attributes",,,cat.c.declarations,true,,ConceptCategory,C,C Declarations,latest,active
+,"Function declarations, definitions, and variadic features",,,cat.c.functions,true,,ConceptCategory,C,C Functions,latest,active
+,Standard C library modules and selected concepts,,,cat.c.library,true,,ConceptCategory,C,C Standard Library,latest,active
+,top-level category for C++ core language concepts,,,cat.cpp.core,true,,ConceptCategory,C++,C++ Core Language,latest,active
+,"Names, ODR, types, objects, scope, lifetime, modules, and memory model",,,cat.cpp.basic,true,,ConceptCategory,C++,C++ Basic Concepts,latest,active
+,Directives and macro processing,,,cat.cpp.preprocessor,true,,ConceptCategory,C++,C++ Preprocessor,latest,active
+,"Value categories, casts, literals, and expression forms",,,cat.cpp.expressions,true,,ConceptCategory,C++,C++ Expressions,latest,active
+,"Namespaces, references, pointers, arrays, auto, decltype, constexpr, and attributes",,,cat.cpp.declarations,true,,ConceptCategory,C++,C++ Declarations,latest,active
+,Initialization forms and copy elision,,,cat.cpp.initialization,true,,ConceptCategory,C++,C++ Initialization,latest,active
+,"Function declarations, overloads, lambdas, variadic arguments, and coroutines",,,cat.cpp.functions,true,,ConceptCategory,C++,C++ Functions,latest,active
+,Control-flow statements including range-for,,,cat.cpp.statements,true,,ConceptCategory,C++,C++ Statements,latest,active
+,"Classes, constructors, destructors, inheritance, virtual dispatch, and polymorphism",,,cat.cpp.classes,true,,ConceptCategory,C++,C++ Classes,latest,active
+,"Templates, specialization, parameter packs, and concepts/constraints",,,cat.cpp.templates,true,,ConceptCategory,C++,C++ Templates,latest,active
+,Exception handling and noexcept,,,cat.cpp.exceptions,true,,ConceptCategory,C++,C++ Exceptions,latest,active
+,Standard C++ library modules and selected concepts,,,cat.cpp.library,true,,ConceptCategory,C++,C++ Standard Library,latest,active
+,Type support and integer/size facilities,,,lib.c.type_support,true,,LibraryModule,C,C Type Support,latest,active
+,General utilities including conversion and process control,,,lib.c.program_utilities,true,,LibraryModule,C,C Program Utilities,latest,active
+,Assertions and error-reporting support,,,lib.c.diagnostics,true,,LibraryModule,C,C Diagnostics Library,latest,active
+,Dynamic allocation and deallocation,,,lib.c.dynamic_memory,true,,LibraryModule,C,C Dynamic Memory Management,latest,active
+,String and memory block operations,,,lib.c.strings,true,,LibraryModule,C,C Strings Library,latest,active
+,Time and date facilities,,,lib.c.datetime,true,,LibraryModule,C,C Date and Time Library,latest,active
+,Locale and localization support,,,lib.c.localization,true,,LibraryModule,C,C Localization Library,latest,active
+,Streams and formatted I/O,,,lib.c.io,true,,LibraryModule,C,C Input/Output Library,latest,active
+,qsort and bsearch style algorithms,,,lib.c.algorithms,true,,LibraryModule,C,C Algorithms Library,latest,active
+,"Math, floating-point, random, complex, bit tools, checked arithmetic",,,lib.c.numerics,true,,LibraryModule,C,C Numerics Library,latest,active
+,Threads and atomic operations,,,lib.c.concurrency,true,,LibraryModule,C,C Concurrency Support Library,latest,active
+,Low-level language support and runtime support,,,lib.cpp.language_support,true,,LibraryModule,C++,C++ Language Support Library,latest,active
+,Compile-time concepts and constraints support,,,lib.cpp.concepts,true,,LibraryModule,C++,C++ Concepts Library,latest,active
+,"Assertions, error codes, and stacktrace",,,lib.cpp.diagnostics,true,,LibraryModule,C++,C++ Diagnostics Library,latest,active
+,"Smart pointers, allocators, and memory resources",,,lib.cpp.memory,true,,LibraryModule,C++,C++ Memory Management Library,latest,active
+,Type traits and compile-time utilities,,,lib.cpp.metaprogramming,true,,LibraryModule,C++,C++ Metaprogramming Library,latest,active
+,"Pair, tuple, optional, variant, any, and function objects",,,lib.cpp.utilities,true,,LibraryModule,C++,C++ General Utilities Library,latest,active
+,"Sequence, associative, unordered, and adaptor containers",,,lib.cpp.containers,true,,LibraryModule,C++,C++ Containers Library,latest,active
+,Iterator abstractions and adapters,,,lib.cpp.iterators,true,,LibraryModule,C++,C++ Iterators Library,latest,active
+,Views and range-based composition,,,lib.cpp.ranges,true,,LibraryModule,C++,C++ Ranges Library,latest,active
+,"Sorting, searching, numeric, and constrained algorithms",,,lib.cpp.algorithms,true,,LibraryModule,C++,C++ Algorithms Library,latest,active
+,String and string_view support,,,lib.cpp.strings,true,,LibraryModule,C++,C++ Strings Library,latest,active
+,"Regex, formatting, and print functions",,,lib.cpp.text_processing,true,,LibraryModule,C++,C++ Text Processing Library,latest,active
+,"Random, numeric algorithms, and complex support",,,lib.cpp.numerics,true,,LibraryModule,C++,C++ Numerics Library,latest,active
+,"chrono, calendar, and timezone support",,,lib.cpp.time,true,,LibraryModule,C++,C++ Time Library,latest,active
+,Iostreams and printing facilities,,,lib.cpp.io,true,,LibraryModule,C++,C++ Input/Output Library,latest,active
+,Filesystem path and directory interaction,,,lib.cpp.filesystem,true,,LibraryModule,C++,C++ Filesystem Library,latest,active
+,"Threads, atomics, mutexes, and condition variables",,,lib.cpp.concurrency,true,,LibraryModule,C++,C++ Concurrency Support Library,latest,active
+,C standard header <stdio.h>,,,hdr.c.stdio,true,,Header,C,<stdio.h>,latest,active
+,C standard header <stdlib.h>,,,hdr.c.stdlib,true,,Header,C,<stdlib.h>,latest,active
+,C standard header <string.h>,,,hdr.c.string,true,,Header,C,<string.h>,latest,active
+,C standard header <math.h>,,,hdr.c.math,true,,Header,C,<math.h>,latest,active
+,C standard header <time.h>,,,hdr.c.time,true,,Header,C,<time.h>,latest,active
+,C standard header <locale.h>,,,hdr.c.locale,true,,Header,C,<locale.h>,latest,active
+,C standard header <assert.h>,,,hdr.c.assert,true,,Header,C,<assert.h>,latest,active
+,C standard header <errno.h>,,,hdr.c.errno,true,,Header,C,<errno.h>,latest,active
+,C standard header <stdarg.h>,,,hdr.c.stdarg,true,,Header,C,<stdarg.h>,latest,active
+,C standard header <stddef.h>,,,hdr.c.stddef,true,,Header,C,<stddef.h>,latest,active
+,C standard header <stdint.h>,,,hdr.c.stdint,true,,Header,C,<stdint.h>,latest,active
+,C standard header <stdatomic.h>,,,hdr.c.stdatomic,true,,Header,C,<stdatomic.h>,latest,active
+,C standard header <threads.h>,,,hdr.c.threads,true,,Header,C,<threads.h>,latest,active
+,C standard header <stdbit.h>,,,hdr.c.stdbit,true,,Header,C,<stdbit.h>,latest,active
+,C standard header <stdckdint.h>,,,hdr.c.stdckdint,true,,Header,C,<stdckdint.h>,latest,active
+,C++ standard header <vector>,,,hdr.cpp.vector,true,,Header,C++,<vector>,latest,active
+,C++ standard header <array>,,,hdr.cpp.array,true,,Header,C++,<array>,latest,active
+,C++ standard header <deque>,,,hdr.cpp.deque,true,,Header,C++,<deque>,latest,active
+,C++ standard header <list>,,,hdr.cpp.list,true,,Header,C++,<list>,latest,active
+,C++ standard header <map>,,,hdr.cpp.map,true,,Header,C++,<map>,latest,active
+,C++ standard header <unordered_map>,,,hdr.cpp.unordered_map,true,,Header,C++,<unordered_map>,latest,active
+,C++ standard header <algorithm>,,,hdr.cpp.algorithm,true,,Header,C++,<algorithm>,latest,active
+,C++ standard header <ranges>,,,hdr.cpp.ranges,true,,Header,C++,<ranges>,latest,active
+,C++ standard header <iterator>,,,hdr.cpp.iterator,true,,Header,C++,<iterator>,latest,active
+,C++ standard header <memory>,,,hdr.cpp.memory,true,,Header,C++,<memory>,latest,active
+,C++ standard header <memory_resource>,,,hdr.cpp.memory_resource,true,,Header,C++,<memory_resource>,latest,active
+,C++ standard header <string>,,,hdr.cpp.string,true,,Header,C++,<string>,latest,active
+,C++ standard header <string_view>,,,hdr.cpp.string_view,true,,Header,C++,<string_view>,latest,active
+,C++ standard header <format>,,,hdr.cpp.format,true,,Header,C++,<format>,latest,active
+,C++ standard header <print>,,,hdr.cpp.print,true,,Header,C++,<print>,latest,active
+,C++ standard header <regex>,,,hdr.cpp.regex,true,,Header,C++,<regex>,latest,active
+,C++ standard header <thread>,,,hdr.cpp.thread,true,,Header,C++,<thread>,latest,active
+,C++ standard header <mutex>,,,hdr.cpp.mutex,true,,Header,C++,<mutex>,latest,active
+,C++ standard header <atomic>,,,hdr.cpp.atomic,true,,Header,C++,<atomic>,latest,active
+,C++ standard header <filesystem>,,,hdr.cpp.filesystem,true,,Header,C++,<filesystem>,latest,active
+,C++ standard header <chrono>,,,hdr.cpp.chrono,true,,Header,C++,<chrono>,latest,active
+,C++ standard header <concepts>,,,hdr.cpp.concepts,true,,Header,C++,<concepts>,latest,active
+,C++ standard header <type_traits>,,,hdr.cpp.type_traits,true,,Header,C++,<type_traits>,latest,active
+,C++ standard header <any>,,,hdr.cpp.any,true,,Header,C++,<any>,latest,active
+,C++ standard header <optional>,,,hdr.cpp.optional,true,,Header,C++,<optional>,latest,active
+,C++ standard header <variant>,,,hdr.cpp.variant,true,,Header,C++,<variant>,latest,active
+,C++ standard header <stacktrace>,,,hdr.cpp.stacktrace,true,,Header,C++,<stacktrace>,latest,active
+,C++ standard header <iostream>,,,hdr.cpp.iostream,true,,Header,C++,<iostream>,latest,active
+cat.c.basic,Named program entity in C,basic,,concept.c.identifier,true,core-language,ProgrammingConcept,C,Identifier,latest,active
+cat.c.basic,Visibility region of identifiers in C,basic,,concept.c.scope,true,core-language,ProgrammingConcept,C,Scope,latest,active
+cat.c.basic,Duration an object exists during execution,basic,,concept.c.lifetime,true,core-language,ProgrammingConcept,C,Lifetime,latest,active
+cat.c.basic,Classification of data and operations in C,basic,,concept.c.type,true,core-language,ProgrammingConcept,C,Type,latest,active
+cat.c.basic,Region of storage with a type and value,basic,,concept.c.object,true,core-language,ProgrammingConcept,C,Object,latest,active
+cat.c.basic,Latest C memory model including data races and atomics,advanced,,concept.c.memory_model,true,core-language,ProgrammingConcept,C,MemoryModel,latest,active
+cat.c.basic,Behavior for which the C standard imposes no requirements,intermediate,,concept.c.undefined_behavior,true,core-language,ProgrammingConcept,C,UndefinedBehavior,latest,active
+cat.c.preprocessor,Definition of function-like and object-like macros,basic,,concept.c.macro_definition,true,core-language,ProgrammingConcept,C,MacroDefinition,latest,active
+cat.c.preprocessor,Including headers with preprocessing directives,basic,,concept.c.file_inclusion,true,core-language,ProgrammingConcept,C,FileInclusion,latest,active
+cat.c.preprocessor,Conditional preprocessing with #if and related directives,basic,,concept.c.conditional_compilation,true,core-language,ProgrammingConcept,C,ConditionalCompilation,latest,active
+cat.c.preprocessor,Implementation-defined preprocessor control using pragma,advanced,,concept.c.pragmas,true,core-language,ProgrammingConcept,C,Pragmas,latest,active
+cat.c.statements,Conditional branching with if / else,basic,,concept.c.if,true,statement,ProgrammingConcept,C,IfStatement,latest,active
+cat.c.statements,Multi-way branching with switch / case,basic,,concept.c.switch,true,statement,ProgrammingConcept,C,SwitchStatement,latest,active
+cat.c.statements,Counter-controlled iteration with for,basic,,concept.c.for,true,statement,ProgrammingConcept,C,ForLoop,latest,active
+cat.c.statements,Condition-controlled iteration with while,basic,,concept.c.while,true,statement,ProgrammingConcept,C,WhileLoop,latest,active
+cat.c.statements,Post-test loop with do-while,basic,,concept.c.do_while,true,statement,ProgrammingConcept,C,DoWhileLoop,latest,active
+cat.c.statements,Early exit from loops or switch,basic,,concept.c.break,true,statement,ProgrammingConcept,C,BreakStatement,latest,active
+cat.c.statements,Proceed to next iteration of loop,basic,,concept.c.continue,true,statement,ProgrammingConcept,C,ContinueStatement,latest,active
+cat.c.statements,Unconditional jump to a labeled statement,advanced,,concept.c.goto,true,statement,ProgrammingConcept,C,GotoStatement,latest,active
+cat.c.statements,Return from function,basic,,concept.c.return,true,statement,ProgrammingConcept,C,ReturnStatement,latest,active
+cat.c.expressions,"A literal constant such as integer, floating, character, string, or nullptr",basic,,concept.c.literal,true,expression,ProgrammingConcept,C,Literal,latest,active
+cat.c.expressions,Standard implicit conversions in expressions,intermediate,,concept.c.implicit_conversion,true,expression,ProgrammingConcept,C,ImplicitConversion,latest,active
+cat.c.expressions,Assignment and compound assignment operators,basic,,concept.c.assignment,true,operator,ProgrammingConcept,C,AssignmentOperator,latest,active
+cat.c.expressions,"Arithmetic operators including +, -, *, /, and %",basic,,concept.c.arithmetic,true,operator,ProgrammingConcept,C,ArithmeticOperator,latest,active
+cat.c.expressions,"Comparison operators such as <, <=, ==, !=",basic,,concept.c.comparison,true,operator,ProgrammingConcept,C,ComparisonOperator,latest,active
+cat.c.expressions,"Logical operators including &&, ||, and !",basic,,concept.c.logical,true,operator,ProgrammingConcept,C,LogicalOperator,latest,active
+cat.c.expressions,Prefix and postfix increment/decrement,basic,,concept.c.incdec,true,operator,ProgrammingConcept,C,IncrementDecrement,latest,active
+cat.c.expressions,Member access with . and ->,basic,,concept.c.member_access,true,operator,ProgrammingConcept,C,MemberAccess,latest,active
+cat.c.expressions,Pointer dereference and indirection,intermediate,,concept.c.indirection,true,operator,ProgrammingConcept,C,Indirection,latest,active
+cat.c.expressions,Conditional operator ?: in C expressions,intermediate,,concept.c.ternary,true,operator,ProgrammingConcept,C,TernaryOperator,latest,active
+cat.c.expressions,Compile-time size query of objects and types,basic,,concept.c.sizeof,true,operator,ProgrammingConcept,C,SizeofOperator,latest,active
+cat.c.expressions,Explicit cast in C expressions,intermediate,,concept.c.cast,true,operator,ProgrammingConcept,C,CastOperator,latest,active
+cat.c.expressions,Type-generic selection expression,advanced,,concept.c.generic_selection,true,core-language,ProgrammingConcept,C,GenericSelection,latest,active
+cat.c.declarations,Named object declaration in C,basic,,concept.c.variable,true,declaration,ProgrammingConcept,C,Variable,latest,active
+cat.c.declarations,Typed memory address value in C,intermediate,,concept.c.pointer,true,declaration,ProgrammingConcept,C,Pointer,latest,active
+cat.c.declarations,Contiguous sequence of elements with fixed extent,basic,,concept.c.array,true,declaration,ProgrammingConcept,C,Array,latest,active
+cat.c.declarations,Enumeration types and constants in C,basic,,concept.c.enumeration,true,declaration,ProgrammingConcept,C,Enumeration,latest,active
+cat.c.declarations,Structured record type with named members,basic,,concept.c.structure,true,declaration,ProgrammingConcept,C,Structure,latest,active
+cat.c.declarations,Union type sharing storage across members,intermediate,,concept.c.union,true,declaration,ProgrammingConcept,C,Union,latest,active
+cat.c.declarations,Packed integral members in structures,advanced,,concept.c.bit_field,true,declaration,ProgrammingConcept,C,BitField,latest,active
+cat.c.declarations,"Static, automatic, allocated duration and linkage",intermediate,,concept.c.storage_duration,true,declaration,ProgrammingConcept,C,StorageDurationAndLinkage,latest,active
+cat.c.declarations,"const, volatile, restrict, and related qualifiers",intermediate,,concept.c.type_qualifier,true,declaration,ProgrammingConcept,C,TypeQualifier,latest,active
+cat.c.declarations,Atomic object types for concurrent programming,advanced,,concept.c.atomic_type,true,declaration,ProgrammingConcept,C,AtomicType,latest,active
+cat.c.declarations,Type aliasing in C declarations,basic,,concept.c.typedef,true,declaration,ProgrammingConcept,C,Typedef,latest,active
+cat.c.declarations,Standardized attribute syntax in latest C,advanced,,concept.c.attributes,true,declaration,ProgrammingConcept,C,Attributes,latest,active
+cat.c.declarations,Alignment control with alignas/related facilities,advanced,,concept.c.alignment,true,declaration,ProgrammingConcept,C,AlignmentSpecifier,latest,active
+cat.c.functions,Function type and declaration syntax in C,basic,,concept.c.function_decl,true,function,ProgrammingConcept,C,FunctionDeclaration,latest,active
+cat.c.functions,Function definition syntax and body,basic,,concept.c.function_def,true,function,ProgrammingConcept,C,FunctionDefinition,latest,active
+cat.c.functions,Inline function specifier in C,intermediate,,concept.c.inline,true,function,ProgrammingConcept,C,InlineFunction,latest,active
+cat.c.functions,Variadic function arguments using stdarg,advanced,,concept.c.variadic_args,true,function,ProgrammingConcept,C,VariadicArguments,latest,active
+cat.c.basic,The nullptr keyword introduced in latest C,basic,,concept.c.nullptr,true,core-language,ProgrammingConcept,C,nullptr,latest,active
+lib.c.dynamic_memory,Allocate dynamic memory block,intermediate,,concept.c.malloc,true,library-function,ProgrammingConcept,C,malloc,latest,active
+lib.c.dynamic_memory,Allocate zero-initialized dynamic memory block,intermediate,,concept.c.calloc,true,library-function,ProgrammingConcept,C,calloc,latest,active
+lib.c.dynamic_memory,Resize dynamic allocation,intermediate,,concept.c.realloc,true,library-function,ProgrammingConcept,C,realloc,latest,active
+lib.c.dynamic_memory,Release dynamic allocation,intermediate,,concept.c.free,true,library-function,ProgrammingConcept,C,free,latest,active
+lib.c.strings,Functions for null-terminated byte strings,basic,,concept.c.string_handling,true,library-concept,ProgrammingConcept,C,StringHandling,latest,active
+lib.c.strings,Copy bytes between memory regions,intermediate,,concept.c.memcpy,true,library-function,ProgrammingConcept,C,memcpy,latest,active
+lib.c.strings,Measure string length excluding null terminator,basic,,concept.c.strlen,true,library-function,ProgrammingConcept,C,strlen,latest,active
+lib.c.io,Formatted input and output with printf/scanf families,basic,,concept.c.formatted_io,true,library-concept,ProgrammingConcept,C,FormattedIO,latest,active
+lib.c.io,Buffered stream file input and output,basic,,concept.c.file_io,true,library-concept,ProgrammingConcept,C,FileIO,latest,active
+lib.c.algorithms,Generic quicksort-like sorting function,intermediate,,concept.c.qsort,true,library-function,ProgrammingConcept,C,qsort,latest,active
+lib.c.algorithms,Binary search over sorted arrays,intermediate,,concept.c.bsearch,true,library-function,ProgrammingConcept,C,bsearch,latest,active
+lib.c.numerics,Standard mathematical functions in C,intermediate,,concept.c.math_functions,true,library-concept,ProgrammingConcept,C,MathFunctions,latest,active
+lib.c.numerics,Pseudo-random number generation facilities,intermediate,,concept.c.random_number,true,library-concept,ProgrammingConcept,C,PseudoRandomNumberGeneration,latest,active
+lib.c.numerics,C23 bit manipulation facilities,advanced,,concept.c.bit_manipulation,true,library-concept,ProgrammingConcept,C,BitManipulation,latest,active
+lib.c.numerics,C23 checked integer arithmetic support,advanced,,concept.c.checked_integer_arithmetic,true,library-concept,ProgrammingConcept,C,CheckedIntegerArithmetic,latest,active
+lib.c.concurrency,Thread creation and management in C,advanced,,concept.c.threads_api,true,library-concept,ProgrammingConcept,C,ThreadsAPI,latest,active
+lib.c.concurrency,Atomic operations and synchronization primitives,advanced,,concept.c.atomics_api,true,library-concept,ProgrammingConcept,C,AtomicsAPI,latest,active
+,Correct indexing boundaries for arrays in C,,,kp.c.array_bounds,true,,KnowledgePoint,C,ArrayBoundsInC,latest,active
+,How pointer arithmetic maps to element sizes,,,kp.c.pointer_arithmetic,true,,KnowledgePoint,C,PointerArithmeticBasics,latest,active
+,"Allocate, use, resize, and free heap memory correctly",,,kp.c.memory_lifecycle,true,,KnowledgePoint,C,DynamicMemoryLifecycle,latest,active
+,Access members correctly with . and -> operators,,,kp.c.struct_layout,true,,KnowledgePoint,C,StructMemberAccess,latest,active
+cat.cpp.basic,Association of names with declarations in C++,basic,,concept.cpp.name_lookup,true,core-language,ProgrammingConcept,C++,NameLookup,latest,active
+cat.cpp.basic,ODR and definition consistency across translation units,advanced,,concept.cpp.odr,true,core-language,ProgrammingConcept,C++,OneDefinitionRule,latest,active
+cat.cpp.basic,"Fundamental, compound, and user-defined types in C++",basic,,concept.cpp.type_system,true,core-language,ProgrammingConcept,C++,TypeSystem,latest,active
+cat.cpp.basic,"Construction, lifetime, and destruction of objects",intermediate,,concept.cpp.object_lifetime,true,core-language,ProgrammingConcept,C++,ObjectLifetime,latest,active
+cat.cpp.basic,Concurrency-aware memory model in latest C++,advanced,,concept.cpp.memory_model,true,core-language,ProgrammingConcept,C++,MemoryModel,latest,active
+cat.cpp.basic,Modular code organization and import semantics,advanced,,concept.cpp.modules,true,core-language,ProgrammingConcept,C++,Modules,latest,active
+cat.cpp.preprocessor,Definition of function-like and object-like macros,basic,,concept.cpp.macro_definition,true,core-language,ProgrammingConcept,C++,MacroDefinition,latest,active
+cat.cpp.preprocessor,Including headers with preprocessing directives,basic,,concept.cpp.file_inclusion,true,core-language,ProgrammingConcept,C++,FileInclusion,latest,active
+cat.cpp.preprocessor,Conditional preprocessing in C++,basic,,concept.cpp.conditional_compilation,true,core-language,ProgrammingConcept,C++,ConditionalCompilation,latest,active
+cat.cpp.expressions,"lvalue, xvalue, prvalue model in C++",advanced,,concept.cpp.value_category,true,expression,ProgrammingConcept,C++,ValueCategory,latest,active
+cat.cpp.expressions,Sequencing and evaluation order rules,advanced,,concept.cpp.evaluation_order,true,expression,ProgrammingConcept,C++,EvaluationOrder,latest,active
+cat.cpp.expressions,Literal syntax including nullptr and user-defined literals,basic,,concept.cpp.literal,true,expression,ProgrammingConcept,C++,Literal,latest,active
+cat.cpp.expressions,Dynamic object allocation and deallocation in C++,intermediate,,concept.cpp.new_delete,false,expression,ProgrammingConcept,C++,NewDeleteExpression,latest,active
+cat.cpp.expressions,"static_cast, dynamic_cast, const_cast, reinterpret_cast",intermediate,,concept.cpp.casts,true,expression,ProgrammingConcept,C++,Casts,latest,active
+cat.cpp.functions,Custom operator implementations in user-defined types,advanced,,concept.cpp.operator_overloading,true,function,ProgrammingConcept,C++,OperatorOverloading,latest,active
+cat.cpp.declarations,Namespace declarations and organization,basic,,concept.cpp.namespace,true,declaration,ProgrammingConcept,C++,Namespace,latest,active
+cat.cpp.declarations,Reference binding semantics in C++,basic,,concept.cpp.reference,true,declaration,ProgrammingConcept,C++,Reference,latest,active
+cat.cpp.declarations,Raw pointers in C++,intermediate,,concept.cpp.pointer,false,declaration,ProgrammingConcept,C++,Pointer,latest,active
+cat.cpp.declarations,Built-in arrays in C++,basic,,concept.cpp.array,false,declaration,ProgrammingConcept,C++,Array,latest,active
+cat.cpp.declarations,Decomposition declarations,intermediate,,concept.cpp.structured_binding,true,declaration,ProgrammingConcept,C++,StructuredBinding,latest,active
+cat.cpp.declarations,Scoped and unscoped enumerations,basic,,concept.cpp.enum,true,declaration,ProgrammingConcept,C++,Enumeration,latest,active
+cat.cpp.declarations,Type deduction with auto,basic,,concept.cpp.auto,true,declaration,ProgrammingConcept,C++,AutoTypeDeduction,latest,active
+cat.cpp.declarations,Type inference from expression form,advanced,,concept.cpp.decltype,true,declaration,ProgrammingConcept,C++,Decltype,latest,active
+cat.cpp.declarations,Compile-time evaluation opt-in facility,advanced,,concept.cpp.constexpr,true,declaration,ProgrammingConcept,C++,Constexpr,latest,active
+cat.cpp.declarations,Constant initialization requirement,advanced,,concept.cpp.constinit,true,declaration,ProgrammingConcept,C++,Constinit,latest,active
+cat.cpp.declarations,Standard attribute syntax,intermediate,,concept.cpp.attributes,true,declaration,ProgrammingConcept,C++,Attributes,latest,active
+cat.cpp.initialization,Initialization without explicit initializer,basic,,concept.cpp.default_init,true,initialization,ProgrammingConcept,C++,DefaultInitialization,latest,active
+cat.cpp.initialization,Value initialization rules in C++,basic,,concept.cpp.value_init,true,initialization,ProgrammingConcept,C++,ValueInitialization,latest,active
+cat.cpp.initialization,Copy-initialization semantics,basic,,concept.cpp.copy_init,true,initialization,ProgrammingConcept,C++,CopyInitialization,latest,active
+cat.cpp.initialization,Direct-initialization semantics,basic,,concept.cpp.direct_init,true,initialization,ProgrammingConcept,C++,DirectInitialization,latest,active
+cat.cpp.initialization,Brace initialization in C++,basic,,concept.cpp.list_init,true,initialization,ProgrammingConcept,C++,ListInitialization,latest,active
+cat.cpp.initialization,Aggregate initialization for aggregate types,intermediate,,concept.cpp.aggregate_init,true,initialization,ProgrammingConcept,C++,AggregateInitialization,latest,active
+cat.cpp.initialization,Reference binding during initialization,intermediate,,concept.cpp.reference_init,true,initialization,ProgrammingConcept,C++,ReferenceInitialization,latest,active
+cat.cpp.initialization,Elision of copies and moves,advanced,,concept.cpp.copy_elision,true,initialization,ProgrammingConcept,C++,CopyElision,latest,active
+cat.cpp.functions,Declaration of free and member functions in C++,basic,,concept.cpp.function_decl,true,function,ProgrammingConcept,C++,FunctionDeclaration,latest,active
+cat.cpp.functions,Selection among overloaded functions,advanced,,concept.cpp.overload_resolution,true,function,ProgrammingConcept,C++,OverloadResolution,latest,active
+cat.cpp.functions,Default function arguments,basic,,concept.cpp.default_args,true,function,ProgrammingConcept,C++,DefaultArguments,latest,active
+cat.cpp.functions,Variadic arguments in C++,advanced,,concept.cpp.variadic_args,true,function,ProgrammingConcept,C++,VariadicArguments,latest,active
+cat.cpp.functions,Anonymous function objects in C++,intermediate,,concept.cpp.lambda,true,function,ProgrammingConcept,C++,LambdaExpression,latest,active
+cat.cpp.functions,Coroutine support in modern C++,advanced,,concept.cpp.coroutines,true,function,ProgrammingConcept,C++,Coroutines,latest,active
+cat.cpp.statements,Conditional branching with if / else,basic,,concept.cpp.if,true,statement,ProgrammingConcept,C++,IfStatement,latest,active
+cat.cpp.statements,Multi-way branching with switch / case,basic,,concept.cpp.switch,true,statement,ProgrammingConcept,C++,SwitchStatement,latest,active
+cat.cpp.statements,Counter-controlled iteration with for,basic,,concept.cpp.for,true,statement,ProgrammingConcept,C++,ForLoop,latest,active
+cat.cpp.statements,Range-based for loop in modern C++,basic,,concept.cpp.range_for,true,statement,ProgrammingConcept,C++,RangeForLoop,latest,active
+cat.cpp.statements,Condition-controlled iteration with while,basic,,concept.cpp.while,true,statement,ProgrammingConcept,C++,WhileLoop,latest,active
+cat.cpp.statements,Post-test loop with do-while,basic,,concept.cpp.do_while,true,statement,ProgrammingConcept,C++,DoWhileLoop,latest,active
+cat.cpp.statements,Early exit from loops or switch,basic,,concept.cpp.break,true,statement,ProgrammingConcept,C++,BreakStatement,latest,active
+cat.cpp.statements,Proceed to next iteration of loop,basic,,concept.cpp.continue,true,statement,ProgrammingConcept,C++,ContinueStatement,latest,active
+cat.cpp.statements,Return from function,basic,,concept.cpp.return,true,statement,ProgrammingConcept,C++,ReturnStatement,latest,active
+cat.cpp.classes,User-defined class type in C++,basic,,concept.cpp.class,true,class,ProgrammingConcept,C++,Class,latest,active
+cat.cpp.classes,Struct type in C++ with default public access,basic,,concept.cpp.struct,true,class,ProgrammingConcept,C++,Struct,latest,active
+cat.cpp.classes,Union type in C++,intermediate,,concept.cpp.union,true,class,ProgrammingConcept,C++,Union,latest,active
+cat.cpp.classes,"public, protected, and private access control",basic,,concept.cpp.access_specifier,true,class,ProgrammingConcept,C++,AccessSpecifier,latest,active
+cat.cpp.classes,Object construction routines,basic,,concept.cpp.constructor,true,class,ProgrammingConcept,C++,Constructor,latest,active
+cat.cpp.classes,Object destruction routine,basic,,concept.cpp.destructor,true,class,ProgrammingConcept,C++,Destructor,latest,active
+cat.cpp.classes,Copy constructor and copy assignment semantics,intermediate,,concept.cpp.copy_semantics,true,class,ProgrammingConcept,C++,CopySemantics,latest,active
+cat.cpp.classes,Move constructor and move assignment semantics,advanced,,concept.cpp.move_semantics,true,class,ProgrammingConcept,C++,MoveSemantics,latest,active
+cat.cpp.classes,Deriving one class from another,intermediate,,concept.cpp.inheritance,true,class,ProgrammingConcept,C++,Inheritance,latest,active
+cat.cpp.classes,Runtime polymorphic virtual dispatch,advanced,,concept.cpp.virtual_function,true,class,ProgrammingConcept,C++,VirtualFunction,latest,active
+cat.cpp.classes,Class with pure virtual functions,advanced,,concept.cpp.abstract_class,true,class,ProgrammingConcept,C++,AbstractClass,latest,active
+cat.cpp.classes,Dynamic polymorphism and runtime type behavior,advanced,,concept.cpp.polymorphism,true,class,ProgrammingConcept,C++,Polymorphism,latest,active
+cat.cpp.classes,Friend relationships between entities,advanced,,concept.cpp.friend,true,class,ProgrammingConcept,C++,FriendDeclaration,latest,active
+cat.cpp.classes,Static data and functions in classes,intermediate,,concept.cpp.static_member,true,class,ProgrammingConcept,C++,StaticMember,latest,active
+cat.cpp.templates,Family of class definitions parameterized by template parameters,advanced,,concept.cpp.class_template,true,template,ProgrammingConcept,C++,ClassTemplate,latest,active
+cat.cpp.templates,Family of functions parameterized by template parameters,advanced,,concept.cpp.function_template,true,template,ProgrammingConcept,C++,FunctionTemplate,latest,active
+cat.cpp.templates,Variable templates in C++,advanced,,concept.cpp.variable_template,true,template,ProgrammingConcept,C++,VariableTemplate,latest,active
+cat.cpp.templates,Explicit specialization of templates,advanced,,concept.cpp.template_specialization,true,template,ProgrammingConcept,C++,TemplateSpecialization,latest,active
+cat.cpp.templates,Partial specialization of class or variable templates,advanced,,concept.cpp.partial_specialization,true,template,ProgrammingConcept,C++,PartialSpecialization,latest,active
+cat.cpp.templates,Template constraints and concepts,advanced,,concept.cpp.concepts_constraints,true,template,ProgrammingConcept,C++,ConceptsAndConstraints,latest,active
+cat.cpp.templates,Variadic template pack parameters,advanced,,concept.cpp.parameter_pack,true,template,ProgrammingConcept,C++,ParameterPack,latest,active
+cat.cpp.templates,Instantiation of template definitions into concrete entities,advanced,,concept.cpp.template_instantiation,true,template,ProgrammingConcept,C++,TemplateInstantiation,latest,active
+cat.cpp.exceptions,Throwing exceptions in C++,intermediate,,concept.cpp.throw,true,exception,ProgrammingConcept,C++,ThrowExpression,latest,active
+cat.cpp.exceptions,Handling exceptions with try and catch,intermediate,,concept.cpp.try_catch,true,exception,ProgrammingConcept,C++,TryCatch,latest,active
+cat.cpp.exceptions,noexcept for exception specification and optimization,advanced,,concept.cpp.noexcept,true,exception,ProgrammingConcept,C++,Noexcept,latest,active
+cat.cpp.exceptions,Standard library exception hierarchy,intermediate,,concept.cpp.standard_exception,true,exception,ProgrammingConcept,C++,StandardException,latest,active
+lib.cpp.memory,Smart pointer ownership abstraction in modern C++,advanced,,concept.cpp.smart_pointer,true,library-concept,ProgrammingConcept,C++,SmartPointer,latest,active
+lib.cpp.memory,Exclusive ownership smart pointer,intermediate,,concept.cpp.unique_ptr,true,library-class,ProgrammingConcept,C++,std::unique_ptr,latest,active
+lib.cpp.memory,Reference-counted shared ownership smart pointer,advanced,,concept.cpp.shared_ptr,true,library-class,ProgrammingConcept,C++,std::shared_ptr,latest,active
+lib.cpp.memory,Non-owning weak reference to shared object,advanced,,concept.cpp.weak_ptr,true,library-class,ProgrammingConcept,C++,std::weak_ptr,latest,active
+lib.cpp.memory,Polymorphic memory resources and allocators,advanced,,concept.cpp.memory_resource,true,library-concept,ProgrammingConcept,C++,MemoryResource,latest,active
+lib.cpp.metaprogramming,Compile-time type inspection and transformation,advanced,,concept.cpp.type_traits,true,library-concept,ProgrammingConcept,C++,TypeTraits,latest,active
+lib.cpp.utilities,Type-erased single value holder,intermediate,,concept.cpp.any,true,library-class,ProgrammingConcept,C++,std::any,latest,active
+lib.cpp.utilities,Optional contained value or empty state,intermediate,,concept.cpp.optional,true,library-class,ProgrammingConcept,C++,std::optional,latest,active
+lib.cpp.utilities,Type-safe tagged union,advanced,,concept.cpp.variant,true,library-class,ProgrammingConcept,C++,std::variant,latest,active
+lib.cpp.utilities,Fixed-size heterogeneous value groups,basic,,concept.cpp.pair_tuple,true,library-concept,ProgrammingConcept,C++,PairAndTuple,latest,active
+lib.cpp.containers,Contiguous dynamic array container,basic,,concept.cpp.vector,true,library-class,ProgrammingConcept,C++,std::vector,latest,active
+lib.cpp.containers,Fixed-size array wrapper with STL interface,basic,,concept.cpp.array_container,true,library-class,ProgrammingConcept,C++,std::array,latest,active
+lib.cpp.containers,Double-ended queue container,intermediate,,concept.cpp.deque,true,library-class,ProgrammingConcept,C++,std::deque,latest,active
+lib.cpp.containers,Bidirectional linked list container,intermediate,,concept.cpp.list,true,library-class,ProgrammingConcept,C++,std::list,latest,active
+lib.cpp.containers,Ordered key-value associative container,intermediate,,concept.cpp.map,true,library-class,ProgrammingConcept,C++,std::map,latest,active
+lib.cpp.containers,Hash-based key-value associative container,intermediate,,concept.cpp.unordered_map,true,library-class,ProgrammingConcept,C++,std::unordered_map,latest,active
+lib.cpp.containers,"Adaptors such as stack, queue, and priority_queue",intermediate,,concept.cpp.stack_queue,true,library-concept,ProgrammingConcept,C++,ContainerAdaptors,latest,active
+lib.cpp.containers,Non-owning view over contiguous sequence,advanced,,concept.cpp.span,true,library-class,ProgrammingConcept,C++,std::span,latest,active
+lib.cpp.iterators,Iterator abstraction over sequences and containers,intermediate,,concept.cpp.iterator,true,library-concept,ProgrammingConcept,C++,Iterator,latest,active
+lib.cpp.ranges,Composable range and view abstraction,advanced,,concept.cpp.ranges,true,library-concept,ProgrammingConcept,C++,RangesLibrary,latest,active
+lib.cpp.ranges,Lazy composable range adaptors,advanced,,concept.cpp.views,true,library-concept,ProgrammingConcept,C++,Views,latest,active
+lib.cpp.algorithms,General-purpose sorting algorithm,basic,,concept.cpp.sort,true,library-function,ProgrammingConcept,C++,std::sort,latest,active
+lib.cpp.algorithms,Linear search algorithm,basic,,concept.cpp.find,true,library-function,ProgrammingConcept,C++,std::find,latest,active
+lib.cpp.algorithms,Binary search over sorted range,intermediate,,concept.cpp.binary_search,true,library-function,ProgrammingConcept,C++,std::binary_search,latest,active
+lib.cpp.algorithms,Numeric accumulation algorithm,intermediate,,concept.cpp.accumulate,true,library-function,ProgrammingConcept,C++,std::accumulate,latest,active
+lib.cpp.strings,Dynamic owning string type,basic,,concept.cpp.string,true,library-class,ProgrammingConcept,C++,std::string,latest,active
+lib.cpp.strings,Non-owning string view type,intermediate,,concept.cpp.string_view,true,library-class,ProgrammingConcept,C++,std::string_view,latest,active
+lib.cpp.text_processing,Regular expression engine and matcher,advanced,,concept.cpp.regex,true,library-class,ProgrammingConcept,C++,std::regex,latest,active
+lib.cpp.text_processing,Type-safe formatting facility,intermediate,,concept.cpp.format,true,library-function,ProgrammingConcept,C++,std::format,latest,active
+lib.cpp.io,High-level print functions standardized in C++23,basic,,concept.cpp.print_functions,true,library-concept,ProgrammingConcept,C++,PrintFunctions,latest,active
+lib.cpp.numerics,Pseudo-random engines and distributions,advanced,,concept.cpp.random,true,library-concept,ProgrammingConcept,C++,RandomNumberGeneration,latest,active
+lib.cpp.time,"Time durations, clocks, and calendar facilities",intermediate,,concept.cpp.chrono,true,library-concept,ProgrammingConcept,C++,std::chrono,latest,active
+lib.cpp.io,Standard stream-based input and output,basic,,concept.cpp.iostream,true,library-concept,ProgrammingConcept,C++,Iostreams,latest,active
+lib.cpp.filesystem,Filesystem path and directory operations,intermediate,,concept.cpp.filesystem,true,library-concept,ProgrammingConcept,C++,std::filesystem,latest,active
+lib.cpp.concurrency,Thread object for concurrent execution,advanced,,concept.cpp.thread,true,library-class,ProgrammingConcept,C++,std::thread,latest,active
+lib.cpp.concurrency,Joining thread wrapper with stop token support,advanced,,concept.cpp.jthread,true,library-class,ProgrammingConcept,C++,std::jthread,latest,active
+lib.cpp.concurrency,Mutual exclusion primitive,advanced,,concept.cpp.mutex,true,library-class,ProgrammingConcept,C++,std::mutex,latest,active
+lib.cpp.concurrency,Atomic object wrapper for lock-free and lock-based concurrency,advanced,,concept.cpp.atomic,true,library-class,ProgrammingConcept,C++,std::atomic,latest,active
+lib.cpp.concurrency,Blocking synchronization primitive for waiting threads,advanced,,concept.cpp.condition_variable,true,library-class,ProgrammingConcept,C++,std::condition_variable,latest,active
+lib.cpp.diagnostics,Stacktrace support added in modern C++,advanced,,concept.cpp.stacktrace,true,library-class,ProgrammingConcept,C++,std::stacktrace,latest,active
+lib.cpp.concepts,Standard library concepts used for template constraints,advanced,,concept.cpp.library_concepts,true,library-concept,ProgrammingConcept,C++,ConceptsLibrary,latest,active
+,Tie resource lifetime to object lifetime using constructors and destructors,,,kp.cpp.raii,true,,KnowledgePoint,C++,RAIIOwnership,latest,active
+,Transfer ownership safely using move semantics,,,kp.cpp.move_ownership,true,,KnowledgePoint,C++,MoveOwnershipTransfer,latest,active
+,Understand when container operations invalidate iterators and references,,,kp.cpp.iterator_invalidation,true,,KnowledgePoint,C++,IteratorInvalidation,latest,active
+,How template arguments are deduced from call-site context,,,kp.cpp.template_deduction,true,,KnowledgePoint,C++,TemplateArgumentDeduction,latest,active
+,"Compose filters, transforms, and views over ranges",,,kp.cpp.range_pipeline,true,,KnowledgePoint,C++,RangePipelineBasics,latest,active
+cat.cpp.classes,Resource Acquisition Is Initialization for deterministic cleanup,advanced,,concept.cpp.raii,true,design-principle,ProgrammingConcept,C++,RAII,latest,active

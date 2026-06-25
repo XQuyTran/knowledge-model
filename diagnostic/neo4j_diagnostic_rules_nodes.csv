@@ -1,0 +1,85 @@
+confidenceBase,description,id,isAutoApplicable,label,level,mode,name,patternType,requiresExecution,status
+,Root category for all diagnostic rules,rulecat.root,,RuleCategory,top,,DiagnosticRuleRoot,,,active
+,"Rules for loops, boundaries, and progress",rulecat.loop,,RuleCategory,top,,LoopDiagnosis,,,active
+,"Rules for arrays, indexing, and traversal",rulecat.array,,RuleCategory,top,,ArrayAndIndexDiagnosis,,,active
+,"Rules for pointer validity, ownership, and memory lifetime",rulecat.pointer,,RuleCategory,top,,PointerAndMemoryDiagnosis,,,active
+,Rules for return behavior and function-level obligations,rulecat.function,,RuleCategory,top,,FunctionContractDiagnosis,,,active
+,Rules for base case and recursive progress,rulecat.recursion,,RuleCategory,top,,RecursionDiagnosis,,,active
+,"Rules for iterators, ranges, and container invalidation",rulecat.iterator,,RuleCategory,top,,IteratorAndRangeDiagnosis,,,active
+,"Rules for virtual dispatch, polymorphic destruction, and RAII",rulecat.oop,,RuleCategory,top,,OOPLifetimeDiagnosis,,,active
+,Rules for formatted input/output and printing APIs,rulecat.io,,RuleCategory,top,,IOFormattingDiagnosis,,,active
+,"Rules for threads, mutexes, atomics, and condition variables",rulecat.concurrency,,RuleCategory,top,,ConcurrencyDiagnosis,,,active
+,Cross-cutting rules that combine multiple evidence types,rulecat.meta,,RuleCategory,top,,MetaAndCrossChecks,,,active
+,Pattern extracted from abstract syntax tree shape or syntax form.,tool.ast,,ToolSignature,,static,ASTInspection,,,active
+,Pattern extracted from control-flow graph shape.,tool.cfg,,ToolSignature,,static,CFGInspection,,,active
+,"Pattern extracted from value, alias, or lifetime flow.",tool.dataflow,,ToolSignature,,static,DataFlowInspection,,,active
+,Derived from Clang Static Analyzer findings or equivalent path-sensitive analyzers.,tool.clangsa,,ToolSignature,,static,ClangStaticAnalyzer,,,active
+,Derived from compiler diagnostics and warnings.,tool.compiler,,ToolSignature,,static,CompilerWarning,,,active
+,Derived from failed edge-case or specification tests.,tool.unittest,,ToolSignature,,dynamic,UnitTestFailure,,,active
+,"Derived from observed crash, timeout, hang, or anomalous runtime behavior.",tool.runtime,,ToolSignature,,dynamic,RuntimeObservation,,,active
+,"Derived from tools such as AddressSanitizer, UBSan, or thread sanitizers.",tool.sanitizer,,ToolSignature,,dynamic,Sanitizer,,,active
+,Derived from linting or best-practice checks for modern C++.,tool.style,,ToolSignature,,static,ModernCppLinter,,,active
+,Loop condition uses <= length or <= size while indexing from zero.,ev.loop.boundary.le_length,,EvidencePattern,,,LoopBoundaryUsesLessEqualLength,ast-pattern,,active
+,Traversal over zero-indexed storage starts at 1 and misses or shifts valid positions.,ev.loop.boundary.starts_one,,EvidencePattern,,,LoopStartsAtOneForZeroIndexedTraversal,ast-pattern,,active
+,Loop variable or termination state is never updated toward exit.,ev.loop.progress.no_update,,EvidencePattern,,,LoopVariableNotUpdated,ast-pattern,,active
+,Loop variable update moves away from satisfying exit condition.,ev.loop.progress.wrong_direction,,EvidencePattern,,,LoopVariableMovesAwayFromExit,ast-pattern,,active
+,Tests fail only on the final boundary element or exact-size edge case.,ev.loop.test.last_case_only,,EvidencePattern,,,FailsOnlyOnLastElementCase,test-pattern,,active
+,Observed timeout or hang in a loop-heavy region.,ev.loop.timeout,,EvidencePattern,,,RuntimeTimeoutInLoopRegion,runtime-pattern,,active
+,Array or vector is directly indexed by its length/size result.,ev.array.index.size_access,,EvidencePattern,,,ArrayIndexedBySizeValue,ast-pattern,,active
+,Logic mixes roles of array element values and positions.,ev.array.index.value_misuse,,EvidencePattern,,,ArrayValueUsedAsIndexOrViceVersa,ast-pattern,,active
+,Boundary test triggers crash or invalid access symptom.,ev.array.bounds.crash,,EvidencePattern,,,OutOfBoundsCrashOnBoundaryTest,runtime-pattern,,active
+,Pointer is dereferenced on a path lacking a guard or ownership guarantee.,ev.pointer.null_check_missing,,EvidencePattern,,,PointerDereferencedWithoutGuard,ast-pattern,,active
+,Static analyzer reports null dereference possibility.,ev.pointer.clang_null,,EvidencePattern,,,ClangNullDereferenceFinding,static-finding,,active
+,Ownership path contains allocation but no matching release or RAII handoff.,ev.memory.alloc_without_release,,EvidencePattern,,,AllocationWithoutMatchingRelease,dataflow-pattern,,active
+,Data-flow shows pointer/resource used after free/delete.,ev.memory.release_then_use,,EvidencePattern,,,ReleaseThenUseAccess,dataflow-pattern,,active
+,Lifetime path contains duplicated release of the same resource.,ev.memory.double_release,,EvidencePattern,,,ResourceReleasedTwice,dataflow-pattern,,active
+,Sanitizer reports heap-use-after-free or invalid lifetime access.,ev.memory.sanitizer_uaf,,EvidencePattern,,,SanitizerUseAfterFreeFinding,dynamic-finding,,active
+,Leak sanitizer or instrumentation shows unreleased allocations.,ev.memory.sanitizer_leak,,EvidencePattern,,,SanitizerLeakFinding,dynamic-finding,,active
+,Compiler warns that control reaches end of non-void function.,ev.function.warn_nonvoid,,EvidencePattern,,,CompilerWarnsControlReachesEndNonVoid,static-finding,,active
+,At least one control-flow path exits without a return in non-void function.,ev.function.path_no_return,,EvidencePattern,,,NonVoidPathMissingReturn,cfg-pattern,,active
+,Recursive function lacks a valid base case branch.,ev.recursion.no_base_case,,EvidencePattern,,,RecursiveFunctionWithoutBaseCase,ast-pattern,,active
+,A base case exists syntactically but cannot be reached for relevant inputs.,ev.recursion.base_unreachable,,EvidencePattern,,,RecursiveBaseCaseUnreachable,cfg-pattern,,active
+,Recursive call fails to reduce problem size toward a base case.,ev.recursion.no_progress,,EvidencePattern,,,RecursiveCallDoesNotReduceProblem,ast-pattern,,active
+,Iterator/reference survives a modification that invalidates it.,ev.iterator.modified_container,,EvidencePattern,,,IteratorUsedAfterContainerModification,dataflow-pattern,,active
+,Iterator is used after erase/pop/reallocation-like operations.,ev.iterator.erase_then_use,,EvidencePattern,,,IteratorUsedAfterErase,dataflow-pattern,,active
+,Non-owning range/view outlives or outscopes its underlying source.,ev.iterator.view_lifetime,,EvidencePattern,,,ViewOrRangeOutlivesSource,dataflow-pattern,,active
+,Object is read as though unchanged after move operation.,ev.move.use_after_move,,EvidencePattern,,,MovedFromObjectUsedAsIfUnchanged,dataflow-pattern,,active
+,Delete is applied through base pointer lacking virtual destructor.,ev.oop.delete_base_no_virtual,,EvidencePattern,,,DeleteThroughBaseWithoutVirtualDestructor,ast-pattern,,active
+,Resource-owning class defines only some copy/move/destructor members.,ev.oop.rule_of_five_partial,,EvidencePattern,,,CustomOwnerDefinesPartialSpecialMembers,ast-pattern,,active
+,Exceptional path can bypass manual cleanup or leave partial state.,ev.oop.exception_cleanup,,EvidencePattern,,,ManualCleanupOnExceptionalPath,cfg-pattern,,active
+,Format specifier and actual argument type do not match.,ev.format.printf_type_mismatch,,EvidencePattern,,,PrintfSpecifierTypeMismatch,ast-pattern,,active
+,Unsafe legacy formatting is used where safer type-aware formatting is expected.,ev.format.mixed_print_api,,EvidencePattern,,,UnsafeCFormattingPreferredOverTypeSafeFormatting,style-pattern,,active
+,Condition variable wait is not wrapped in a predicate-checking loop.,ev.concurrent.wait_without_predicate,,EvidencePattern,,,ConditionWaitWithoutPredicateLoop,ast-pattern,,active
+,Shared state and notify/wait protocol are not synchronized consistently.,ev.concurrent.notify_without_lock_protocol,,EvidencePattern,,,NotifyAndStateProtocolBroken,dataflow-pattern,,active
+,Shared mutable state accessed across threads without evident synchronization.,ev.concurrent.thread_shared_state_no_sync,,EvidencePattern,,,SharedStateAccessWithoutSynchronization,dataflow-pattern,,active
+,"Most tests pass but edge cases fail, suggesting boundary or contract issue.",ev.cross.edge_only_failure,,EvidencePattern,,,FailsOnlyOnEdgeCaseTests,test-pattern,,active
+0.91,Detect off-by-one traversal logic when a loop uses <= length while indexing from zero.,rule.loop.off_by_one.leq_length,true,DiagnosticRule,,,DetectOffByOneFromLessEqualLength,,false,active
+0.79,Detect off-by-one behavior when traversal starts at one in zero-indexed structures.,rule.loop.off_by_one.start_one,true,DiagnosticRule,,,DetectOffByOneFromStartOne,,false,active
+0.95,Detect infinite loop caused by missing progress update.,rule.loop.infinite.missing_update,true,DiagnosticRule,,,DetectInfiniteLoopFromMissingUpdate,,false,active
+0.88,Detect infinite loop when progress moves away from exit condition.,rule.loop.infinite.wrong_direction,true,DiagnosticRule,,,DetectInfiniteLoopFromWrongDirection,,false,active
+0.74,Infer boundary bug from failure isolated to last/edge element tests.,rule.loop.boundary.edge_case,true,DiagnosticRule,,,DetectBoundaryLogicFromEdgeCaseFailure,,true,active
+0.90,Detect out-of-bounds access where array/container is indexed by its size directly.,rule.array.out_of_bounds.size_index,true,DiagnosticRule,,,DetectArrayOutOfBoundsFromSizeIndex,,false,active
+0.72,Detect confusion between index and value roles in traversal/update logic.,rule.array.index_value_confusion,true,DiagnosticRule,,,DetectIndexValueRoleConfusion,,false,active
+0.83,Detect possible null dereference from an unsafe dereference pattern.,rule.pointer.null_deref.ast,true,DiagnosticRule,,,DetectNullDereferenceFromUnsafeDereference,,false,active
+0.97,Attach null dereference diagnosis when the static analyzer reports it.,rule.pointer.null_deref.clang,true,DiagnosticRule,,,DetectNullDereferenceFromAnalyzer,,false,active
+0.87,Detect memory leak from ownership flow missing a release or RAII handoff.,rule.memory.leak.alloc_no_release,true,DiagnosticRule,,,DetectMemoryLeakFromMissingRelease,,false,active
+0.96,Detect use-after-free when data-flow shows access after release.,rule.memory.use_after_free.flow,true,DiagnosticRule,,,DetectUseAfterFreeFromDataFlow,,false,active
+0.95,Detect double release of the same ownership resource.,rule.memory.double_free.flow,true,DiagnosticRule,,,DetectDoubleFreeFromDataFlow,,false,active
+0.99,Trust sanitizer evidence for use-after-free diagnosis.,rule.memory.uaf.sanitizer,true,DiagnosticRule,,,DetectUseAfterFreeFromSanitizer,,true,active
+0.99,Trust sanitizer or leak instrumentation for memory leak diagnosis.,rule.memory.leak.sanitizer,true,DiagnosticRule,,,DetectMemoryLeakFromSanitizer,,true,active
+0.98,Detect missing return in non-void function from compiler diagnostic.,rule.function.missing_return.compiler,true,DiagnosticRule,,,DetectMissingReturnFromCompilerWarning,,false,active
+0.86,Detect missing return by finding a control-flow path with no return.,rule.function.missing_return.cfg,true,DiagnosticRule,,,DetectMissingReturnFromCFG,,false,active
+0.89,Detect recursion bug when no valid base case is present.,rule.recursion.no_base_case,true,DiagnosticRule,,,DetectWrongBaseCaseFromMissingBase,,false,active
+0.84,Detect recursion bug when base case exists but is unreachable.,rule.recursion.unreachable_base,true,DiagnosticRule,,,DetectWrongBaseCaseFromUnreachableBase,,false,active
+0.93,Detect recursive non-progress when recursive calls do not reduce problem size.,rule.recursion.no_progress,true,DiagnosticRule,,,DetectNoRecursiveProgress,,false,active
+0.94,Detect iterator invalidation caused by modify-then-use pattern.,rule.iterator.invalidation.modify_then_use,true,DiagnosticRule,,,DetectIteratorInvalidationAfterModification,,false,active
+0.82,Detect view or range lifetime misuse when source outlives assumptions fail.,rule.iterator.view_lifetime,true,DiagnosticRule,,,DetectRangeViewLifetimeIssue,,false,active
+0.85,Detect invalid dependence on moved-from object state.,rule.move.use_after_move,true,DiagnosticRule,,,DetectUseAfterMove,,false,active
+0.96,Detect missing virtual destructor when deleting through base pointer.,rule.oop.delete_base_no_virtual,true,DiagnosticRule,,,DetectMissingVirtualDestructor,,false,active
+0.81,Detect a likely Rule of Five violation in a resource-owning type.,rule.oop.rule_of_five,true,DiagnosticRule,,,DetectRuleOfFiveViolation,,false,active
+0.77,Detect likely exception-safety issue from manual cleanup on exceptional path.,rule.oop.exception_safety,true,DiagnosticRule,,,DetectExceptionSafetyViolation,,false,active
+0.95,Detect mismatch between formatting specifier and argument type.,rule.format.specifier_mismatch,true,DiagnosticRule,,,DetectFormatSpecifierMismatch,,false,active
+0.64,Recommend upgrading from unsafe formatting to type-safe modern formatting APIs.,rule.format.modern_cpp_upgrade,false,DiagnosticRule,,,RecommendTypeSafeFormatting,,false,active
+0.88,Detect condition variable wait misuse without predicate-based waiting.,rule.concurrent.wait_protocol,true,DiagnosticRule,,,DetectConditionVariableProtocolMisuse,,false,active
+0.76,Detect unsafe shared-state access with insufficient synchronization evidence.,rule.concurrent.missing_sync,true,DiagnosticRule,,,DetectSharedStateWithoutSynchronization,,false,active
+0.71,Use cross-evidence from edge-case failures to strengthen boundary-related diagnoses.,rule.meta.edge_case_boundary,true,DiagnosticRule,,,CrossCheckBoundaryBugFromEdgeCasePattern,,true,active
