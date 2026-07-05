@@ -20,6 +20,42 @@ class TestCase:
 
 
 @dataclass
+class ProblemKnowledge:
+    problem_id: str
+    title: str
+    description: str
+    category: str
+    algorithm: str
+    data_structures: List[str]
+    difficulty: str
+    common_bugs: List[str]
+    correct_code: str
+    expected_output: str
+    source: str
+
+    @property
+    def algorithm_key(self) -> str:
+        return f"algorithm.{self.algorithm.lower().replace(' ', '_')}"
+
+    @property
+    def category_key(self) -> str:
+        return f"category.{self.category.lower().replace(' ', '_')}"
+
+    def matches_statement(self, statement: str) -> float:
+        score = 0.0
+        s_lower = statement.lower()
+        for keyword in [self.algorithm, self.category] + self.data_structures:
+            if keyword.lower() in s_lower:
+                score += 0.25
+        title_words = set(self.title.lower().split())
+        statement_words = set(s_lower.split())
+        common = title_words & statement_words
+        if common:
+            score += 0.1 * len(common)
+        return min(1.0, score)
+
+
+@dataclass
 class DiagnosticRequest:
     problem_statement: str
     source_code: str
@@ -28,6 +64,7 @@ class DiagnosticRequest:
     test_cases: List[TestCase] = field(default_factory=list)
     compiler_flags: List[str] = field(default_factory=list)
     enable_sanitizers: bool = True
+    problem_id: Optional[str] = None
 
 
 @dataclass
@@ -56,6 +93,7 @@ class SemanticNote:
     claim: str
     confidence: float
     supporting_lines: List[int] = field(default_factory=list)
+    causal_chain: List[str] = field(default_factory=list)
 
 
 @dataclass
@@ -116,4 +154,5 @@ class DiagnosticReport:
     natural_language_feedback: str
     evidence: List[EvidenceInstance]
     semantic_notes: List[SemanticNote]
+    matched_problems: List[ProblemKnowledge] = field(default_factory=list)
     debug: Dict[str, Any] = field(default_factory=dict)

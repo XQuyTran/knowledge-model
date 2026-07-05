@@ -1,4 +1,4 @@
-from diagnostic_pipeline_production import DiagnosticPipeline, DiagnosticRequest, TestCase
+from diagnostic_pipeline import DiagnosticPipeline, DiagnosticRequest, TestCase
 
 
 if __name__ == '__main__':

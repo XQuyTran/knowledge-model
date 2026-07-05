@@ -1,190 +1,204 @@
-# Hệ thống hỗ trợ giải bài tập lập trình có hướng dẫn
+# Hệ thống hỗ trợ giải bài tập lập trình có hướng dẫn từng bước
 
-## Tổng quan
-
-Hệ thống chẩn đoán lỗi logic và thuật toán trong mã nguồn C/C++ sinh viên, sau đó tạo ra lời giải từng bước có giải thích ngữ cảnh (Context-Aware Explanations) dựa trên mô hình tri thức lỗi.
-
-Hệ thống bao gồm bốn lớp ontology tích hợp:
-
-1. Concept Ontology
-2. Bug Ontology
-3. Diagnostic Rules Ontology
-4. Explanation and Feedback Ontology
-
-Các lớp này được liên kết thông qua các định danh thống nhất như:
-
-- concept.*
-- bug.*
-- rule.*
-- fix.*
-- mis.*
-- view.*
-
-Kiến trúc cho phép phát hiện bug tự động, suy luận và sinh phản hồi hướng dẫn học.
+**Môn học:** Biểu diễn Tri Thức (BDTT)  
+**Đề tài:** Project 1 — Hệ thống chẩn đoán lỗi logic và thuật toán trong mã nguồn sinh viên
 
 ---
 
-## 1. Concept Ontology
+## Kiến trúc tổng quan
 
-Tập tin:
-- neo4j_latest_concepts_nodes.csv
-- neo4j_latest_concepts_relationships.csv
-- neo4j_latest_concepts_seed.cypher
+```
+                     ┌─────────────────────┐
+                     │   Frontend (HTML/JS) │
+                     │  /static/index.html  │
+                     └──────────┬──────────┘
+                                │ POST /diagnose
+                     ┌──────────▼──────────┐
+                     │    FastAPI Backend   │
+                     │   api/main.py        │
+                     └──────────┬──────────┘
+                                │
+              ┌─────────────────┼─────────────────┐
+              ▼                 ▼                  ▼
+     ┌─────────────┐   ┌──────────────┐   ┌──────────────┐
+     │  Static     │   │  Semantic    │   │  Graph DB    │
+     │  Analyzers  │   │  LLM Analysis│   │  (Neo4j)     │
+     │  (Clang...) │   │  (GPT-4...)  │   │  Ontology    │
+     └─────────────┘   └──────────────┘   └──────────────┘
+```
 
-Mục đích:
-- Biểu diễn kiến thức lập trình C (C23) và C++ (C++23)
+### 4 tầng Ontology (Neo4j)
 
-Các loại node chính:
-- ProgrammingConcept
-- ConceptCategory
-- LibraryModule
-- PedagogicalView
-- KnowledgePoint
-
-Các quan hệ chính:
-- BELONGS_TO
-- PREREQUISITE_OF
-- IMPLEMENTED_IN
-- MODULE_OF
-- VISIBLE_IN
-
-Vai trò:
-- Lớp nền tảng cho toàn bộ hệ thống
-
----
-
-## 2. Bug Ontology
-
-Tập tin:
-- neo4j_bug_ontology_nodes.csv
-- neo4j_bug_ontology_relationships.csv
-- neo4j_bug_ontology_seed.cypher
-
-Mục đích:
-- Mô tả lỗi lập trình dưới dạng có cấu trúc
-
-Các loại node chính:
-- ProgrammingBug
-- BugCategory
-- Symptom
-- Effect
-- Misconception
-- FixStrategy
-
-Các quan hệ chính:
-- BELONGS_TO_CATEGORY
-- HAS_SYMPTOM
-- HAS_EFFECT
-- CAUSED_BY_MISCONCEPTION
-- FIXED_BY
-- OCCURS_IN_CONCEPT
-- VISIBLE_IN
-
-Vai trò:
-- Liên kết giữa code lỗi và tri thức
+| Tầng | Mô tả | Thư mục |
+|------|-------|---------|
+| Concept Ontology | Kiến thức C/C++ (biến, mảng, vòng lặp...) | `concepts/` |
+| Bug Ontology | Lỗi thường gặp, symptom, misconception | `bugs/` |
+| Diagnostic Rules Ontology | Luật phát hiện lỗi từ evidence | `diagnostic/` |
+| Explanation & Feedback Ontology | Sinh giải thích từng bước + hướng sửa | `explanation/` |
 
 ---
 
-## 3. Diagnostic Rules Ontology
+## Cách chạy
 
-Tập tin:
-- neo4j_diagnostic_rules_nodes.csv
-- neo4j_diagnostic_rules_relationships.csv
-- neo4j_diagnostic_rules_seed.cypher
-- build_neo4j_diagnostic_rules_dataset.py
+### Yêu cầu
+- Docker & Docker Compose v2+
+- Git
 
-Mục đích:
-- Xây dựng các luật phát hiện lỗi
+### 1. Clone & setup
 
-Các loại node chính:
-- DiagnosticRule
-- RuleCategory
-- EvidencePattern
-- ToolSignature
+```bash
+git clone <repo-url> project
+cd project
 
-Các quan hệ chính:
-- DETECTS_BUG
-- APPLIES_TO_CONCEPT
-- USES_EVIDENCE
-- SUPPORTED_BY_TOOL
-- RECOMMENDS_FIX
-- VISIBLE_IN
+# Copy environment configs
+cp .env.example .env
+cp .env.llm.example .env.llm
+# Sửa .env.llm với API key của bạn (nếu dùng LLM)
+```
 
-Vai trò:
-- Lớp suy luận phát hiện lỗi
+### 2. Chạy full stack (recommended)
 
----
+```bash
+# Khởi động Neo4j + App
+docker compose up -d neo4j app
 
-## 4. Explanation and Feedback Ontology
+# Seed dữ liệu ontology vào Neo4j (chạy 1 lần)
+docker compose --profile seed run neo4j-seed
 
-Tập tin:
-- neo4j_explanation_feedback_nodes.csv
-- neo4j_explanation_feedback_relationships.csv
-- neo4j_explanation_feedback_seed.cypher
-- build_neo4j_explanation_feedback_dataset.py
+# Kiểm tra
+curl http://localhost:8000/health
+```
 
-Mục đích:
-- Sinh lời giải thích và phản hồi học tập có cấu trúc
+### 3. Hoặc chạy local (không Docker, không LLM)
 
-Các loại node chính:
-- ExplanationTemplate
-- ExplanationStep
-- ExplanationCategory
-- FeedbackPattern
-- ContextAnchorType
-- RemediationPlan
+```bash
+# Cài Python >= 3.11 + clang/clang-tidy
+pip install -r requirements.txt
 
-Các quan hệ chính:
-- EXPLAINS_BUG
-- TRIGGERED_BY_RULE
-- TARGETS_MISCONCEPTION
-- SUGGESTS_FIX
-- REINFORCES_CONCEPT
-- USES_FEEDBACK_PATTERN
-- USES_CONTEXT_ANCHOR
-- CONSISTS_OF_STEP
-- RECOMMENDS_PLAN
-- RECOMMENDS_CONCEPT
+# Chạy backend
+export USE_NEO4J=false
+uvicorn diagnostic_pipeline.api.main:app --host 0.0.0.0 --port 8000 --reload
+```
 
-Vai trò:
-- Lớp sinh phản hồi
----
+### 4. Truy cập
 
-## Liên kết giữa các lớp
-
-Pipeline suy luận tổng thể:
-
-Concept -> Bug -> Diagnostic Rule -> Explanation -> Feedback -> Remediation Plan
----
-
-## Thứ tự import vào Neo4j
-
-Thực hiện theo thứ tự:
-
-1. Concept Ontology
-2. Bug Ontology
-3. Diagnostic Rules Ontology
-4. Explanation and Feedback Ontology
-
-Lý do:
-- Các lớp sau phụ thuộc vào id của lớp trước
----
-
-## Tái tạo tập dữ liệu
-
-Chạy các lệnh:
-
-python build_neo4j_diagnostic_rules_dataset.py
-python build_neo4j_explanation_feedback_dataset.py
+Mở trình duyệt: [http://localhost:8000](http://localhost:8000)
 
 ---
 
-## Khả năng của hệ thống
+## Cấu trúc thư mục
 
-Hệ tri thức hỗ trợ:
+```
+project/
+├── concepts/           # Concept Ontology (C/C++ knowledge)
+│   ├── neo4j_*_nodes.csv
+│   ├── neo4j_*_relationships.csv
+│   └── neo4j_*_seed.cypher
+├── bugs/               # Bug Ontology
+├── diagnostic/         # Diagnostic Rules Ontology
+├── explanation/        # Explanation & Feedback Ontology
+├── repairs/            # Repair Ontology
+├── diagnostic_pipeline/ # Core engine
+│   ├── api/            # FastAPI backend
+│   │   └── main.py
+│   ├── static/         # Frontend (HTML/CSS/JS)
+│   │   ├── index.html
+│   │   ├── styles.css
+│   │   └── app.js
+│   ├── pipeline.py     # DiagnosticPipeline orchestrator
+│   ├── clang_analyzers.py
+│   ├── evidence_builder.py
+│   ├── graph_repository.py
+│   ├── ranking.py
+│   ├── llm_client.py
+│   └── llm_semantic.py
+├── evaluation/         # So sánh Hybrid vs LLM-only
+│   ├── benchmark_cases.py
+│   ├── run_evaluation.py
+│   └── results/
+├── docker-compose.yml
+├── Dockerfile
+├── pyproject.toml
+├── .env.example
+└── .env.llm.example
+```
 
-- Phát hiện lỗi tự động
-- Sinh phản hồi có cấu trúc
-- Giải thích theo ngữ cảnh khái niệm
-- Liên kết misconception với hướng sửa
-- Gợi ý lộ trình học tập
+---
+
+## Pipeline chẩn đoán
+
+```
+Student Code
+    │
+    ▼
+┌─────────────────────────────────────┐
+│  Static Analyzers                   │
+│  ├─ ClangASTAnalyzer (AST dump)     │
+│  ├─ ClangStaticAnalyzer (--analyze) │
+│  ├─ ClangTidyAnalyzer               │
+│  ├─ LocalSandboxRunner (chạy thử)   │
+│  └─ SanitizerRunner (ASan/UBSan)    │
+└──────────────┬──────────────────────┘
+               │ EvidenceInstance[]
+               ▼
+┌─────────────────────────────────────┐
+│  Evidence Builder                   │
+│  ├─ Merge & dedup evidence          │
+│  └─ Infer concepts from evidence    │
+└──────────────┬──────────────────────┘
+               │ evidence_ids + concept_ids
+               ▼
+┌─────────────────────────────────────┐
+│  Graph Repository (Neo4j / Memory)  │
+│  ├─ match_rules(evidence, concepts) │
+│  ├─ select_explanation(bug_id)      │
+│  └─ select_repair_plan(bug_id)      │
+└──────────────┬──────────────────────┘
+               │ RuleHit[]
+               ▼
+┌─────────────────────────────────────┐
+│  Bug Ranking Engine                 │
+│  (score = 0.5*rule + 0.42*evidence)│
+└──────────────┬──────────────────────┘
+               │ top BugCandidate
+               ▼
+┌─────────────────────────────────────┐
+│  LLM Semantic Analysis (optional)   │
+│  + Feedback Generation              │
+└──────────────┬──────────────────────┘
+               │ DiagnosticReport
+               ▼
+         Step-by-step Explanation + Repair Plan
+```
+
+---
+
+## Chạy đánh giá (so sánh Hybrid vs LLM-only)
+
+Yêu cầu đồ án: so sánh hiệu quả giữa hệ thống và giải pháp chỉ dùng LLM.
+
+```bash
+cd evaluation
+python run_evaluation.py
+```
+
+Kết quả được ghi tại `evaluation/results/` gồm:
+- `evaluation_report.md` — báo cáo Markdown
+- `evaluation_results.json` — dữ liệu JSON chi tiết
+
+---
+
+## Cách đóng góp
+
+Xem `project.md` để biết yêu cầu đầy đủ. Các việc cần làm:
+
+- [x] Sửa lỗi import package name
+- [x] Tạo pyproject.toml cho Docker build
+- [x] Tạo .env.example và .env.llm.example
+- [x] Xóa duplicate SanitizerRunner
+- [x] Cải thiện Frontend UI
+- [x] Tạo module đánh giá (Hybrid vs LLM-only)
+- [ ] Mở rộng Bug Ontology với nhiều loại lỗi hơn
+- [ ] Thêm bài tập mẫu cho testing
+- [ ] Viết unit tests
+- [ ] Cải thiện pipeline chẩn đoán

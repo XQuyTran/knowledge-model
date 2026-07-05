@@ -103,8 +103,7 @@ class SanitizerRunner(Analyzer):
                     input_data=test.input_data,
                     preexec_fn=limiter,
                 )
-                output = result.stdout + '
-' + result.stderr
+                output = result.stdout + '\n' + result.stderr
                 if 'heap-use-after-free' in output or 'use-after-free' in output:
                     evidence.append(EvidenceInstance('ev.memory.sanitizer_uaf', 'SanitizerRunner', 0.99, 'AddressSanitizer reports use-after-free.', SourceLocation(request.file_path), {'raw': output[-2000:]}))
                 if 'LeakSanitizer' in output or 'detected memory leaks' in output:

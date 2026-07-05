@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Dict, List
+from typing import Dict, List, Set
 
 from .models import BugCandidate, EvidenceInstance, RuleHit
 
@@ -11,6 +11,12 @@ SOURCE_WEIGHT = {
     'ClangAST': 0.76,
     'LocalSandboxRunner': 0.72,
 }
+
+GENERIC_EVIDENCE: Set[str] = {'ev.compile.error', 'ev.function.warn_nonvoid'}
+
+
+def _is_specific_evidence(evidence: List[EvidenceInstance]) -> bool:
+    return any(e.evidence_id not in GENERIC_EVIDENCE for e in evidence)
 
 
 class BugRankingEngine:
@@ -36,6 +42,9 @@ class BugRankingEngine:
             rule_score = max((h.confidence for h in hits), default=0.0)
             concept_bonus = 0.04 if any(h.matched_concept_ids for h in hits) else 0.0
             multi_source_bonus = 0.04 if len({e.source for e in collected}) > 1 else 0.0
-            score = min(1.0, 0.50 * rule_score + 0.42 * evidence_strength + concept_bonus + multi_source_bonus)
-            candidates.append(BugCandidate(bug_id, round(score, 4), hits, collected))
+            penalty = 0.0
+            if bug_id == 'bug.compile_error' and _is_specific_evidence(evidence):
+                penalty = 0.30
+            score = min(1.0, 0.50 * rule_score + 0.42 * evidence_strength + concept_bonus + multi_source_bonus - penalty)
+            candidates.append(BugCandidate(bug_id, round(max(0.0, score), 4), hits, collected))
         return sorted(candidates, key=lambda x: x.score, reverse=True)

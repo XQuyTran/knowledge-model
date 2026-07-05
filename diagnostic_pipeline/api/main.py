@@ -10,9 +10,10 @@ from fastapi.responses import FileResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 
-from diagnostic_pipeline_production import DiagnosticPipeline, DiagnosticRequest, TestCase
-from diagnostic_pipeline_production.graph_repository import InMemoryGraphRepository, Neo4jGraphRepository
-from diagnostic_pipeline_production.llm_client import build_llm_client_from_env
+from diagnostic_pipeline import DiagnosticPipeline, DiagnosticRequest, TestCase
+from diagnostic_pipeline.exercise_knowledge_base import EXERCISES, get_problem_by_id
+from diagnostic_pipeline.graph_repository import InMemoryGraphRepository, Neo4jGraphRepository
+from diagnostic_pipeline.llm_client import build_llm_client_from_env
 
 try:
     from neo4j import GraphDatabase
@@ -35,6 +36,7 @@ class DiagnoseRequestPayload(BaseModel):
     compiler_flags: List[str] = Field(default_factory=list)
     enable_sanitizers: bool = True
     test_cases: List[TestCasePayload] = Field(default_factory=list)
+    problem_id: Optional[str] = None
 
 
 class DiagnoseResponsePayload(BaseModel):
@@ -45,6 +47,7 @@ class DiagnoseResponsePayload(BaseModel):
     semantic_notes: List[dict[str, Any]]
     repair_plan: Optional[dict[str, Any]]
     alternatives: List[dict[str, Any]]
+    matched_problems: List[dict[str, Any]]
     debug: dict[str, Any]
 
 
@@ -98,6 +101,42 @@ def health() -> dict[str, Any]:
     }
 
 
+@app.get("/exercises")
+def list_exercises() -> List[dict[str, Any]]:
+    return [
+        {
+            "problem_id": ex.problem_id,
+            "title": ex.title,
+            "category": ex.category,
+            "algorithm": ex.algorithm,
+            "data_structures": ex.data_structures,
+            "difficulty": ex.difficulty,
+            "source": ex.source,
+        }
+        for ex in EXERCISES
+    ]
+
+
+@app.get("/exercises/{problem_id}")
+def get_exercise(problem_id: str) -> Optional[dict[str, Any]]:
+    ex = get_problem_by_id(problem_id)
+    if not ex:
+        return None
+    return {
+        "problem_id": ex.problem_id,
+        "title": ex.title,
+        "description": ex.description,
+        "category": ex.category,
+        "algorithm": ex.algorithm,
+        "data_structures": ex.data_structures,
+        "difficulty": ex.difficulty,
+        "common_bugs": ex.common_bugs,
+        "correct_code": ex.correct_code,
+        "expected_output": ex.expected_output,
+        "source": ex.source,
+    }
+
+
 @app.post("/diagnose", response_model=DiagnoseResponsePayload)
 def diagnose(payload: DiagnoseRequestPayload) -> DiagnoseResponsePayload:
     request = DiagnosticRequest(
@@ -116,6 +155,7 @@ def diagnose(payload: DiagnoseRequestPayload) -> DiagnoseResponsePayload:
             )
             for item in payload.test_cases
         ],
+        problem_id=payload.problem_id,
     )
     report = pipeline.diagnose(request)
     return DiagnoseResponsePayload(
@@ -145,6 +185,18 @@ def diagnose(payload: DiagnoseRequestPayload) -> DiagnoseResponsePayload:
             if report.repair_plan else None
         ),
         alternatives=[{"bug_id": c.bug_id, "score": c.score} for c in report.alternatives],
+        matched_problems=[
+            {
+                "problem_id": p.problem_id,
+                "title": p.title,
+                "category": p.category,
+                "algorithm": p.algorithm,
+                "data_structures": p.data_structures,
+                "difficulty": p.difficulty,
+                "source": p.source,
+            }
+            for p in report.matched_problems
+        ],
         debug=report.debug,
     )
 

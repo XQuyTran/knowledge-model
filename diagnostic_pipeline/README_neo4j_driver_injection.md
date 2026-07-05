@@ -6,7 +6,7 @@ This update replaces custom session-factory injection with direct `neo4j.Driver`
 
 ```python
 from neo4j import GraphDatabase
-from diagnostic_pipeline_production.graph_repository import Neo4jGraphRepository
+from diagnostic_pipeline.graph_repository import Neo4jGraphRepository
 
 
 driver = GraphDatabase.driver(

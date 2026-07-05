@@ -1,7 +1,15 @@
-from typing import List
+from typing import List, Optional
 
+from .exercise_knowledge_base import find_matching_problems, get_problem_by_id
 from .interfaces import GraphRepository
-from .models import ExplanationSelection, ExplanationStep, RepairPlanSelection, RepairStep, RuleHit
+from .models import (
+    ExplanationSelection,
+    ExplanationStep,
+    ProblemKnowledge,
+    RepairPlanSelection,
+    RepairStep,
+    RuleHit,
+)
 
 
 class InMemoryGraphRepository(GraphRepository):
@@ -21,6 +29,28 @@ class InMemoryGraphRepository(GraphRepository):
         'ev.move.use_after_move': [('rule.move.use_after_move', ['bug.use_after_move'], 0.85)],
         'ev.oop.delete_base_no_virtual': [('rule.oop.delete_base_no_virtual', ['bug.missing_virtual_destructor'], 0.96)],
         'ev.format.printf_type_mismatch': [('rule.format.specifier_mismatch', ['bug.format_specifier_mismatch'], 0.95)],
+        'ev.uninitialized.value': [('rule.memory.uninitialized', ['bug.uninitialized_value'], 0.85)],
+        'ev.compile.error': [('rule.compile.error', ['bug.compile_error'], 0.99)],
+        'ev.loop.no_progress': [('rule.loop.no_progress', ['bug.wrong_loop_condition', 'bug.infinite_loop'], 0.88)],
+    }
+
+    PROBLEM_RULES = {
+        'ex_array_sum': {'algorithm': 'algorithm.duyet_mang_tuan_tu', 'bugs': ['bug.off_by_one', 'bug.array_out_of_bounds']},
+        'ex_array_max': {'algorithm': 'algorithm.duyet_mang_tim_max', 'bugs': ['bug.off_by_one', 'bug.uninitialized_value']},
+        'ex_array_reverse': {'algorithm': 'algorithm.dao_nguoc_tai_cho', 'bugs': ['bug.off_by_one', 'bug.array_out_of_bounds']},
+        'ex_loop_factorial': {'algorithm': 'algorithm.vong_lap_tich_luy', 'bugs': ['bug.off_by_one', 'bug.wrong_loop_condition']},
+        'ex_loop_prime': {'algorithm': 'algorithm.kiem_tra_uoc_so', 'bugs': ['bug.wrong_loop_condition', 'bug.off_by_one']},
+        'ex_loop_fibonacci': {'algorithm': 'algorithm.vong_lap_bo_nho_dem', 'bugs': ['bug.off_by_one', 'bug.uninitialized_value']},
+        'ex_rec_factorial': {'algorithm': 'algorithm.de_quy_tuyen_tinh', 'bugs': ['bug.no_recursive_progress', 'bug.missing_return']},
+        'ex_rec_fibonacci': {'algorithm': 'algorithm.de_quy_nhi_phan', 'bugs': ['bug.no_recursive_progress', 'bug.missing_return', 'bug.off_by_one']},
+        'ex_rec_hanoi': {'algorithm': 'algorithm.de_quy_chia_de_tri', 'bugs': ['bug.no_recursive_progress', 'bug.wrong_loop_condition']},
+        'ex_ds_linked_list': {'algorithm': 'algorithm.thao_tac_danh_sach_lien_ket', 'bugs': ['bug.null_dereference', 'bug.memory_leak', 'bug.dangling_pointer']},
+        'ex_ds_stack_array': {'algorithm': 'algorithm.ngan_xep_lifo', 'bugs': ['bug.array_out_of_bounds', 'bug.off_by_one']},
+        'ex_sort_bubble': {'algorithm': 'algorithm.bubble_sort', 'bugs': ['bug.off_by_one', 'bug.array_out_of_bounds', 'bug.wrong_loop_condition']},
+        'ex_sort_selection': {'algorithm': 'algorithm.selection_sort', 'bugs': ['bug.off_by_one', 'bug.array_out_of_bounds']},
+        'ex_sort_insertion': {'algorithm': 'algorithm.insertion_sort', 'bugs': ['bug.array_out_of_bounds', 'bug.off_by_one']},
+        'ex_search_linear': {'algorithm': 'algorithm.tim_kiem_tuyen_tinh', 'bugs': ['bug.off_by_one', 'bug.wrong_loop_condition']},
+        'ex_search_binary': {'algorithm': 'algorithm.tim_kiem_nhi_phan', 'bugs': ['bug.off_by_one', 'bug.wrong_loop_condition', 'bug.infinite_loop']},
     }
 
     def match_rules(self, evidence_ids: List[str], concept_ids: List[str]) -> List[RuleHit]:
@@ -30,7 +60,24 @@ class InMemoryGraphRepository(GraphRepository):
                 hits.append(RuleHit(rule_id, bug_ids, [evidence_id], concept_ids[:4], confidence))
         return hits
 
-    def select_explanation(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> ExplanationSelection | None:
+    def match_problem_rules(self, problem_id: str) -> List[RuleHit]:
+        info = self.PROBLEM_RULES.get(problem_id)
+        if not info:
+            return []
+        return [
+            RuleHit(
+                rule_id=f'rule.problem.{info["algorithm"]}',
+                bug_ids=info['bugs'],
+                matched_evidence_ids=[],
+                matched_concept_ids=[info['algorithm']],
+                confidence=0.75,
+            )
+        ]
+
+    def match_problems(self, statement: str, top_n: int = 3) -> List[ProblemKnowledge]:
+        return find_matching_problems(statement, top_n)
+
+    def select_explanation(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> Optional[ExplanationSelection]:
         return ExplanationSelection(
             template_id=f'expl.auto.{bug_id}',
             name=f'Explanation for {bug_id}',
@@ -41,7 +88,7 @@ class InMemoryGraphRepository(GraphRepository):
             ],
         )
 
-    def select_repair_plan(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> RepairPlanSelection | None:
+    def select_repair_plan(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> Optional[RepairPlanSelection]:
         plan_by_bug = {
             'bug.off_by_one': ('repair.boundary_validation', 'BoundaryValidation', ['Inspect the loop boundary and decide whether the upper bound should be exclusive.', 'Verify the valid index range for the accessed sequence.', 'Change the smallest condition or index expression and rerun the boundary test.']),
             'bug.array_out_of_bounds': ('repair.boundary_validation', 'BoundaryValidation', ['Locate the index expression that can exceed the sequence range.', 'Constrain the index to the valid range.', 'Rerun the smallest failing boundary case.']),
@@ -54,6 +101,10 @@ class InMemoryGraphRepository(GraphRepository):
             'bug.use_after_move': ('repair.move_semantic_safety', 'MoveSemanticSafetyRepair', ['Locate the move operation.', 'Find later reads of the moved-from object.', 'Reinitialize the object or avoid depending on its old value.']),
             'bug.missing_virtual_destructor': ('repair.polymorphic_lifetime', 'PolymorphicLifetimeRepair', ['Locate deletion through a base pointer.', 'Check whether the base class is polymorphic.', 'Add a virtual destructor to the base class.']),
             'bug.format_specifier_mismatch': ('repair.format_type_safety', 'FormatTypeSafetyRepair', ['Locate the formatting call.', 'Match each placeholder to its argument type.', 'Correct the specifier or use type-safe formatting.']),
+            'bug.wrong_loop_condition': ('repair.loop_condition', 'LoopConditionRepair', ['Identify the loop condition that causes incorrect iteration.', 'Determine the correct bound or increment.', 'Fix the condition and verify with test cases.']),
+            'bug.infinite_loop': ('repair.infinite_loop', 'InfiniteLoopRepair', ['Locate the loop that does not terminate.', 'Check if the loop variable is updated correctly.', 'Add or fix the update statement inside the loop.']),
+            'bug.uninitialized_value': ('repair.initialize_variable', 'InitializeVariableRepair', ['Locate the variable read before initialization.', 'Assign a default value at declaration.', 'Verify the value is correct for all code paths.']),
+            'bug.compile_error': ('repair.fix_syntax', 'FixSyntaxRepair', ['Read the compiler error message.', 'Fix the reported line.', 'Recompile and verify.']),
         }
         plan = plan_by_bug.get(bug_id)
         if not plan:
@@ -64,8 +115,6 @@ class InMemoryGraphRepository(GraphRepository):
 
 
 class Neo4jGraphRepository(GraphRepository):
-    """Neo4j-backed repository using direct neo4j.Driver injection."""
-
     def __init__(self, driver, database: str = 'neo4j'):
         self.driver = driver
         self.database = database
@@ -90,7 +139,28 @@ class Neo4jGraphRepository(GraphRepository):
             records = session.run(query, evidence_ids=evidence_ids, concept_ids=concept_ids)
             return [RuleHit(record['rule_id'], list(record['bug_ids']), list(record['evidence_ids']), list(record['concept_ids']), float(record['confidence'])) for record in records]
 
-    def select_explanation(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> ExplanationSelection | None:
+    def match_problem_rules(self, problem_id: str) -> List[RuleHit]:
+        query = """
+        MATCH (p:Problem {id: $problem_id})-[:HAS_ALGORITHM]->(algo:Algorithm)
+        OPTIONAL MATCH (p)-[:HAS_COMMON_BUG]->(b:ProgrammingBug)
+        RETURN algo.id AS algorithm_id,
+               collect(DISTINCT b.id) AS bug_ids
+        """
+        with self._session() as session:
+            record = session.run(query, problem_id=problem_id).single()
+            if not record:
+                return []
+            return [
+                RuleHit(
+                    rule_id=f'rule.problem.{record["algorithm_id"]}',
+                    bug_ids=list(record['bug_ids']),
+                    matched_evidence_ids=[],
+                    matched_concept_ids=[record['algorithm_id']],
+                    confidence=0.75,
+                )
+            ]
+
+    def select_explanation(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> Optional[ExplanationSelection]:
         query = """
         MATCH (t:ExplanationTemplate)-[:EXPLAINS_BUG]->(:ProgrammingBug {id: $bug_id})
         OPTIONAL MATCH (t)-[:TRIGGERED_BY_RULE]->(r:DiagnosticRule)
@@ -106,10 +176,10 @@ class Neo4jGraphRepository(GraphRepository):
             record = session.run(query, bug_id=bug_id, rule_ids=rule_ids).single()
             if not record:
                 return None
-            steps = [ExplanationStep(x.get('name') or 'Step', x.get('text') or '', x.get('kind') or 'repair') for x in record['steps'] if x.get('text')]
+            steps = [ExplanationStep(x['name'] or 'Step', x['text'] or '', x['kind'] or 'repair') for x in record['steps'] if x.get('text')]
             return ExplanationSelection(record['template_id'], record['name'], steps)
 
-    def select_repair_plan(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> RepairPlanSelection | None:
+    def select_repair_plan(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> Optional[RepairPlanSelection]:
         query = """
         MATCH (p:RepairPlan)-[:REPAIRS_BUG]->(:ProgrammingBug {id: $bug_id})
         OPTIONAL MATCH (p)-[cs:CONSISTS_OF_STEP]->(s:RepairStepTemplate)

@@ -7,6 +7,7 @@ EVIDENCE_TO_CONCEPTS = {
     'ev.loop.boundary.le_length': ['concept.c.array', 'concept.c.for', 'concept.cpp.vector', 'concept.cpp.range_for'],
     'ev.loop.boundary.starts_one': ['concept.c.array', 'concept.c.for', 'concept.cpp.array', 'concept.cpp.vector'],
     'ev.loop.timeout': ['concept.c.for', 'concept.c.while', 'concept.cpp.for', 'concept.cpp.while'],
+    'ev.loop.no_progress': ['concept.c.while', 'concept.c.for', 'concept.cpp.loop'],
     'ev.cross.edge_only_failure': ['concept.c.array', 'concept.cpp.vector', 'concept.cpp.range_for'],
     'ev.array.index.size_access': ['concept.c.array', 'concept.cpp.array', 'concept.cpp.vector'],
     'ev.array.bounds.crash': ['concept.c.array', 'concept.cpp.array', 'concept.cpp.vector'],
@@ -21,6 +22,8 @@ EVIDENCE_TO_CONCEPTS = {
     'ev.move.use_after_move': ['concept.cpp.move_semantics', 'concept.cpp.unique_ptr', 'concept.cpp.vector'],
     'ev.oop.delete_base_no_virtual': ['concept.cpp.class', 'concept.cpp.virtual_function', 'concept.cpp.destructor'],
     'ev.format.printf_type_mismatch': ['concept.c.formatted_io', 'concept.cpp.format', 'concept.cpp.print_functions'],
+    'ev.compile.error': ['concept.c.syntax', 'concept.cpp.compilation'],
+    'ev.uninitialized.value': ['concept.c.variable', 'concept.cpp.initialization'],
 }
 
 
