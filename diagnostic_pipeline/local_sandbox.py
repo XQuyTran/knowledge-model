@@ -1,6 +1,6 @@
 import tempfile
 from pathlib import Path
-from typing import List
+from typing import List, Tuple
 
 from .interfaces import Analyzer
 from .models import DiagnosticRequest, EvidenceInstance, SourceLocation
@@ -24,6 +24,32 @@ class LocalSandboxRunner(Analyzer):
         self.runner = runner or ToolRunner(timeout_seconds=8.0)
         self.cpu_seconds = cpu_seconds
         self.memory_bytes = memory_bytes
+
+    def _classify_runtime_failure(self, result) -> Tuple[str, float, str, dict]:
+        output = (result.stdout + "\n" + result.stderr).lower()
+        metadata = {'stderr': result.stderr[-1000:], 'stdout': result.stdout[-1000:]}
+        if any(token in output for token in (
+            'segmentation fault',
+            'stack-buffer-overflow',
+            'heap-buffer-overflow',
+            'global-buffer-overflow',
+            'out-of-bounds',
+            'out of bounds',
+            'buffer overflow',
+            'wild pointer',
+        )):
+            return (
+                'ev.array.bounds.crash',
+                0.90,
+                'Runtime behavior suggests an out-of-bounds access.',
+                metadata,
+            )
+        return (
+            'ev.runtime.crash',
+            0.80,
+            "Test crashed or exited abnormally.",
+            metadata,
+        )
 
     def analyze(self, request: DiagnosticRequest) -> List[EvidenceInstance]:
         if not request.test_cases:
@@ -60,7 +86,15 @@ class LocalSandboxRunner(Analyzer):
                 if result.timed_out:
                     evidence.append(EvidenceInstance('ev.loop.timeout', 'LocalSandboxRunner', 0.85, f"Test '{test.name}' timed out.", SourceLocation(request.file_path)))
                 elif result.exit_code != 0:
-                    evidence.append(EvidenceInstance('ev.runtime.crash', 'LocalSandboxRunner', 0.80, f"Test '{test.name}' crashed or exited abnormally.", SourceLocation(request.file_path), {'stderr': result.stderr[-1000:]}))
+                    evidence_id, confidence, description, metadata = self._classify_runtime_failure(result)
+                    evidence.append(EvidenceInstance(
+                        evidence_id=evidence_id,
+                        source='LocalSandboxRunner',
+                        confidence=confidence,
+                        description=description,
+                        location=SourceLocation(request.file_path),
+                        metadata=metadata,
+                    ))
                 elif test.expected_output and result.stdout.strip() != test.expected_output.strip():
                     evidence.append(EvidenceInstance('ev.cross.edge_only_failure', 'LocalSandboxRunner', 0.68, f"Test '{test.name}' produced unexpected output.", SourceLocation(request.file_path), {'stdout': result.stdout[-1000:], 'expected': test.expected_output}))
             return evidence

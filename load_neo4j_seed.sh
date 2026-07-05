@@ -1,24 +1,20 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-NEO4J_URI="${NEO4J_URI:-bolt://neo4j:7687}"
-NEO4J_USER="${NEO4J_USER:-neo4j}"
-NEO4J_PASSWORD="${NEO4J_PASSWORD:-password}"
-NEO4J_DATABASE="${NEO4J_DATABASE:-neo4j}"
 WORKSPACE_DIR="${WORKSPACE_DIR:-/workspace}"
 
 SEED_FILES=(
-  "neo4j_latest_concepts_seed.cypher"
-  "neo4j_bug_ontology_seed.cypher"
-  "neo4j_diagnostic_rules_seed.cypher"
-  "neo4j_explanation_feedback_seed.cypher"
-  "neo4j_repair_ontology_seed.cypher"
+  "concepts/neo4j_latest_concepts_seed.cypher"
+  "bugs/neo4j_bug_ontology_seed.cypher"
+  "diagnostic/neo4j_diagnostic_rules_seed.cypher"
+  "explanation/neo4j_explanation_feedback_seed.cypher"
+  "repairs/neo4j_repair_ontology_seed.cypher"
 )
 
 function wait_for_neo4j() {
   echo "[seed] Waiting for Neo4j at ${NEO4J_URI} ..."
-  for attempt in $(seq 1 60); do
-    if cypher-shell -a "${NEO4J_URI}" -u "${NEO4J_USER}" -p "${NEO4J_PASSWORD}" -d "${NEO4J_DATABASE}" "RETURN 1;" >/dev/null 2>&1; then
+  for attempt in $(seq 1 30); do
+    if cypher-shell --format verbose -d system "SHOW DATABASES"; then
       echo "[seed] Neo4j is ready."
       return 0
     fi
@@ -46,7 +42,7 @@ function assert_seed_files_exist() {
 function apply_seed_file() {
   local file_path="$1"
   echo "[seed] Applying ${file_path} ..."
-  cypher-shell     -a "${NEO4J_URI}"     -u "${NEO4J_USER}"     -p "${NEO4J_PASSWORD}"     -d "${NEO4J_DATABASE}"     --fail-fast     -f "${file_path}"
+  cypher-shell -d "${NEO4J_DATABASE}" --fail-fast --file "${file_path}"
   echo "[seed] Applied ${file_path}"
 }
 
