@@ -1,23 +1,31 @@
 <!doctype html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Code Diagnostic Assistant</title>
+  <title>Code Diagnostic Assistant — BDTT Project</title>
   <link rel="stylesheet" href="/static/styles.css" />
 </head>
 <body>
   <main class="page">
     <section class="hero">
       <h1>Code Diagnostic Assistant</h1>
-      <p>Paste a problem statement and C/C++ solution to receive a diagnosis and step-by-step repair guidance.</p>
+      <p>Hệ thống hỗ trợ giải bài tập lập trình có hướng dẫn từng bước — BDTT Project 1</p>
+      <p class="hero-sub">Nhập đề bài và mã nguồn C/C++ để nhận chẩn đoán lỗi và hướng dẫn sửa từng bước.</p>
     </section>
+
     <section class="grid">
       <form id="diagnose-form" class="card form-card">
-        <label for="problem_statement">Problem statement</label>
-        <textarea id="problem_statement" rows="7" required>Compute the sum of n array elements.</textarea>
-        <label for="source_code">Source code</label>
-        <textarea id="source_code" rows="18" required>#include &lt;iostream&gt;
+        <label for="problem_selector">📚 Chọn bài tập từ CSDL tri thức</label>
+        <select id="problem_selector">
+          <option value="">-- Tự nhập đề bài --</option>
+        </select>
+
+        <label for="problem_statement">Đề bài (Problem Statement)</label>
+        <textarea id="problem_statement" rows="4" placeholder="Mô tả bài toán lập trình..." required>Tính tổng n phần tử mảng</textarea>
+
+        <label for="source_code">Mã nguồn C/C++</label>
+        <textarea id="source_code" rows="14" placeholder="Paste code C/C++..." required spellcheck="false">#include &lt;iostream&gt;
 int main() {
     int n = 5;
     int a[5] = {1, 2, 3, 4, 5};
@@ -27,24 +35,39 @@ int main() {
     }
     std::cout &lt;&lt; sum;
 }</textarea>
+
         <details>
-          <summary>Optional test case</summary>
-          <label for="test_input">Input</label>
-          <textarea id="test_input" rows="3"></textarea>
-          <label for="expected_output">Expected output</label>
-          <textarea id="expected_output" rows="3">15</textarea>
+          <summary>⚙️ Test case (tùy chọn)</summary>
+          <label for="test_input">Standard Input</label>
+          <textarea id="test_input" rows="2" placeholder="(để trống nếu không có)"></textarea>
+          <label for="expected_output">Expected Output</label>
+          <textarea id="expected_output" rows="2" placeholder="Kết quả mong đợi">15</textarea>
         </details>
+
         <div class="actions">
-          <button type="submit">Diagnose</button>
-          <button type="button" id="clear-output">Clear result</button>
+          <button type="submit">🔍 Chẩn đoán</button>
+          <button type="button" id="clear-output">Xóa</button>
         </div>
       </form>
+
       <section class="card result-card">
-        <div class="result-header"><h2>Diagnosis result</h2><span id="status" class="status">Idle</span></div>
+        <div class="result-header">
+          <h2>Kết quả chẩn đoán</h2>
+          <span id="status" class="status">Sẵn sàng</span>
+        </div>
+
         <div id="summary" class="summary"></div>
-        <h3>Feedback</h3><pre id="feedback" class="feedback"></pre>
-        <h3>Evidence</h3><div id="evidence" class="evidence"></div>
-        <h3>Repair plan</h3><ol id="repair-steps" class="repair-steps"></ol>
+
+        <div id="problem-info" class="problem-info"></div>
+
+        <div class="section-title">📝 Phản hồi (Feedback)</div>
+        <pre id="feedback" class="feedback"></pre>
+
+        <div class="section-title">🔎 Bằng chứng (Evidence)</div>
+        <div id="evidence" class="evidence"></div>
+
+        <div class="section-title">🔧 Kế hoạch sửa lỗi (Repair Plan)</div>
+        <ol id="repair-steps" class="repair-steps"></ol>
       </section>
     </section>
   </main>

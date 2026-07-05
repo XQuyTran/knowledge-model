@@ -1,8 +1,8 @@
 from neo4j import GraphDatabase
 
-from diagnostic_pipeline_production import DiagnosticPipeline, DiagnosticRequest, TestCase
-from diagnostic_pipeline_production.graph_repository import Neo4jGraphRepository
-from diagnostic_pipeline_production.llm_client import OpenAICompatibleLLMClient
+from diagnostic_pipeline import DiagnosticPipeline, DiagnosticRequest, TestCase
+from diagnostic_pipeline.graph_repository import Neo4jGraphRepository
+from diagnostic_pipeline.llm_client import OpenAICompatibleLLMClient
 
 
 def main() -> None:
