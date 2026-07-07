@@ -2,163 +2,158 @@ from __future__ import annotations
 
 import json
 import os
-import urllib.parse
-import urllib.request
+import re
 from dataclasses import dataclass
 from typing import Optional
 
+from openai import AzureOpenAI, OpenAI
+
 from .interfaces import LLMClient
+
+try:
+    from azure.identity import DefaultAzureCredential, get_bearer_token_provider
+except Exception:  # pragma: no cover - optional dependency
+    DefaultAzureCredential = None
+    get_bearer_token_provider = None
 
 
 @dataclass(frozen=True)
 class LLMConnectionSettings:
     provider: str
-    api_base_url: str
-    api_key: str
     model: str
     timeout_seconds: float = 20.0
+    api_base_url: Optional[str] = None
+    api_key: Optional[str] = None
     azure_api_version: Optional[str] = None
     azure_deployment: Optional[str] = None
+    azure_use_entra_id: bool = False
 
 
 class OpenAICompatibleLLMClient(LLMClient):
-    """HTTP client for OpenAI-compatible chat completion APIs.
+    """Thin adapter around the official OpenAI/Azure OpenAI Python SDK.
 
-    Supported environment-variable modes:
-
-    1. Generic OpenAI-compatible endpoint
-       - LLM_API_BASE_URL
-       - LLM_API_KEY
-       - LLM_MODEL
-       - LLM_TIMEOUT_SECONDS (optional)
-
-    2. Azure OpenAI endpoint
-       - AZURE_OPENAI_ENDPOINT
-       - AZURE_OPENAI_API_KEY
-       - AZURE_OPENAI_DEPLOYMENT
-       - AZURE_OPENAI_API_VERSION (optional, default: 2026-01-01-preview)
-       - LLM_MODEL (optional display name only)
-       - LLM_TIMEOUT_SECONDS (optional)
+    This class preserves the existing ``LLMClient`` interface used by the
+    pipeline while delegating all transport/authentication to the official SDK.
     """
 
-    def __init__(self, api_base_url: str, api_key: str, model: str, timeout_seconds: float = 20.0):
-        self.api_base_url = api_base_url.rstrip('/')
-        self.api_key = api_key
-        self.model = model
-        self.timeout_seconds = timeout_seconds
-
-    @classmethod
-    def from_env(cls) -> LLMClient:
-        client = build_llm_client_from_env()
-        if client is None:
-            raise RuntimeError(
-                "LLM environment variables are not configured. "
-                "Set either LLM_API_BASE_URL/LLM_API_KEY/LLM_MODEL or "
-                "AZURE_OPENAI_ENDPOINT/AZURE_OPENAI_API_KEY/AZURE_OPENAI_DEPLOYMENT."
-            )
-        return client
-
-    def _build_url(self) -> str:
-        return f'{self.api_base_url}/chat/completions'
-
-    def _build_headers(self) -> dict:
-        return {
-            'Content-Type': 'application/json',
-            'Authorization': f'Bearer {self.api_key}',
-        }
-
-    def _build_payload(self, system_prompt: str, user_prompt: str, schema_hint: str) -> dict:
-        return {
-            'model': self.model,
-            'temperature': 0.1,
-            'response_format': {'type': 'json_object'},
-            'messages': [{'role': 'system', 'content': system_prompt + 'Return valid JSON only. Schema hint:' + schema_hint},
-                {'role': 'user', 'content': user_prompt},
-            ],
-        }
-
-    def complete_json(self, system_prompt: str, user_prompt: str, schema_hint: str) -> dict:
-        payload = self._build_payload(system_prompt, user_prompt, schema_hint)
-        req = urllib.request.Request(
-            url=self._build_url(),
-            data=json.dumps(payload).encode('utf-8'),
-            headers=self._build_headers(),
-            method='POST',
-        )
-        with urllib.request.urlopen(req, timeout=self.timeout_seconds) as response:
-            body = json.loads(response.read().decode('utf-8'))
-        content = body['choices'][0]['message']['content']
-        return json.loads(content)
-
-
-class AzureOpenAIClient(OpenAICompatibleLLMClient):
     def __init__(
         self,
-        endpoint: str,
-        api_key: str,
-        deployment: str,
-        api_version: str,
-        model: str | None = None,
+        *,
+        provider: str,
+        model: str,
         timeout_seconds: float = 20.0,
-    ):
-        self.endpoint = endpoint.rstrip('/')
-        self.deployment = deployment
-        self.api_version = api_version
-        super().__init__(api_base_url=self.endpoint, api_key=api_key, model=model or deployment, timeout_seconds=timeout_seconds)
+        api_key: Optional[str] = None,
+        api_base_url: Optional[str] = None,
+        azure_api_version: Optional[str] = None,
+        azure_deployment: Optional[str] = None,
+        azure_use_entra_id: bool = False,
+    ) -> None:
+        self.provider = provider
+        self.model = model
+        self.timeout_seconds = timeout_seconds
+        if provider == "azure-openai":
+            if not azure_deployment:
+                raise ValueError("Azure OpenAI requires explicit deployment name")
+            self.azure_deployment = azure_deployment
+        else:
+            self.azure_deployment = None
 
-    def _build_url(self) -> str:
-        base = f'{self.endpoint}/openai/deployments/{self.deployment}/chat/completions'
-        query = urllib.parse.urlencode({'api-version': self.api_version})
-        return f'{base}?{query}'
+        if provider == "azure-openai":
+            if not api_base_url:
+                raise ValueError("Azure OpenAI requires AZURE_OPENAI_ENDPOINT or LLM_API_BASE_URL.")
 
-    def _build_headers(self) -> dict:
-        return {
-            'Content-Type': 'application/json',
-            'api-key': self.api_key,
-        }
+            if azure_use_entra_id:
+                if DefaultAzureCredential is None or get_bearer_token_provider is None:
+                    raise RuntimeError(
+                        "azure-identity is required for Azure Entra ID authentication. "
+                        "Install with: pip install azure-identity"
+                    )
+                token_provider = get_bearer_token_provider(
+                    DefaultAzureCredential(),
+                    "https://cognitiveservices.azure.com/.default",
+                )
+                self.client = AzureOpenAI(
+                    azure_endpoint=api_base_url.rstrip("/"),
+                    api_version=azure_api_version or "2026-01-01-preview",
+                    azure_ad_token_provider=token_provider,
+                    timeout=timeout_seconds,
+                )
+            else:
+                if not api_key:
+                    raise ValueError("Azure OpenAI requires AZURE_OPENAI_API_KEY (or enable Entra ID).")
+                self.client = AzureOpenAI(
+                    azure_endpoint=api_base_url.rstrip("/"),
+                    api_key=api_key,
+                    api_version=azure_api_version or "2026-01-01-preview",
+                    timeout=timeout_seconds,
+                )
+        else:
+            if not api_key:
+                raise ValueError("OpenAI requires OPENAI_API_KEY or LLM_API_KEY.")
+            kwargs = {"api_key": api_key, "timeout": timeout_seconds}
+            if api_base_url:
+                kwargs["base_url"] = api_base_url.rstrip("/")
+            self.client = OpenAI(**kwargs)
 
-    def _build_payload(self, system_prompt: str, user_prompt: str, schema_hint: str) -> dict:
-        # Azure uses deployment in URL, not model in payload.
-        return {
-            'temperature': 0.1,
-            'response_format': {'type': 'json_object'},
-            'messages': [
-                {'role': 'system', 'content': system_prompt + 'Return valid JSON only. Schema hint: ' + schema_hint},
-                {'role': 'user', 'content': user_prompt},
+    def complete_json(self, system_prompt: str, user_prompt: str, schema_hint: str) -> dict:
+        response = self.client.chat.completions.create(
+            model=self.azure_deployment if self.provider == "azure-openai" else self.model,
+            response_format={"type": "json_object"},
+            messages=[
+                {
+                    "role": "system",
+                    "content": system_prompt + "\nReturn strictly valid JSON that follows this schema hint:\n" + schema_hint,
+                },
+                {"role": "user", "content": user_prompt},
             ],
-        }
+        )
+        content = response.choices[0].message.content or "{}"
+        return self._parse_json(content)
+
+    def _parse_json(self, content: str) -> dict:
+        try:
+            return json.loads(content)
+        except json.JSONDecodeError:
+            match = re.search(r"\{[\s\S]*\}", content)
+            if match:
+                return json.loads(match.group(0))
+            raise ValueError(f"Model response is not valid JSON: {content[:500]}")
 
 
 def load_llm_settings_from_env() -> Optional[LLMConnectionSettings]:
-    timeout_seconds = float(os.getenv('LLM_TIMEOUT_SECONDS', '20.0'))
+    timeout_seconds = float(os.getenv("LLM_TIMEOUT_SECONDS", "20.0"))
 
-    azure_endpoint = os.getenv('AZURE_OPENAI_ENDPOINT')
-    azure_api_key = os.getenv('AZURE_OPENAI_API_KEY')
-    azure_deployment = os.getenv('AZURE_OPENAI_DEPLOYMENT')
-    azure_api_version = os.getenv('AZURE_OPENAI_API_VERSION', '2026-01-01-preview')
+    azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+    azure_api_key = os.getenv("AZURE_OPENAI_API_KEY")
+    azure_deployment = os.getenv("AZURE_OPENAI_DEPLOYMENT")
+    azure_api_version = os.getenv("AZURE_OPENAI_API_VERSION")
+    azure_use_entra_id = os.getenv("AZURE_OPENAI_USE_ENTRA_ID", "false").lower() in {"1", "true", "yes"}
 
-    if azure_endpoint and azure_api_key and azure_deployment:
+    if azure_endpoint and (azure_api_key or azure_use_entra_id or azure_deployment):
         return LLMConnectionSettings(
-            provider='azure-openai',
-            api_base_url=azure_endpoint.rstrip('/'),
+            provider="azure-openai",
+            api_base_url=azure_endpoint,
             api_key=azure_api_key,
-            model=os.getenv('LLM_MODEL', azure_deployment),
+            model=os.getenv("LLM_MODEL", azure_deployment or ""),
             timeout_seconds=timeout_seconds,
             azure_api_version=azure_api_version,
             azure_deployment=azure_deployment,
+            azure_use_entra_id=azure_use_entra_id,
         )
 
-    api_base_url = os.getenv('LLM_API_BASE_URL')
-    api_key = os.getenv('LLM_API_KEY')
-    model = os.getenv('LLM_MODEL')
-    if api_base_url and api_key and model:
+    openai_api_key = os.getenv("OPENAI_API_KEY") or os.getenv("LLM_API_KEY")
+    openai_base_url = os.getenv("OPENAI_BASE_URL") or os.getenv("LLM_API_BASE_URL")
+    openai_model = os.getenv("OPENAI_MODEL") or os.getenv("LLM_MODEL")
+
+    if openai_api_key and openai_model:
         return LLMConnectionSettings(
-            provider='openai-compatible',
-            api_base_url=api_base_url.rstrip('/'),
-            api_key=api_key,
-            model=model,
+            provider="openai",
+            api_base_url=openai_base_url,
+            api_key=openai_api_key,
+            model=openai_model,
             timeout_seconds=timeout_seconds,
         )
+
     return None
 
 
@@ -166,18 +161,13 @@ def build_llm_client_from_env() -> Optional[LLMClient]:
     settings = load_llm_settings_from_env()
     if settings is None:
         return None
-    if settings.provider == 'azure-openai':
-        return AzureOpenAIClient(
-            endpoint=settings.api_base_url,
-            api_key=settings.api_key,
-            deployment=settings.azure_deployment or settings.model,
-            api_version=settings.azure_api_version or '2026-01-01-preview',
-            model=settings.model,
-            timeout_seconds=settings.timeout_seconds,
-        )
     return OpenAICompatibleLLMClient(
-        api_base_url=settings.api_base_url,
-        api_key=settings.api_key,
+        provider=settings.provider,
         model=settings.model,
         timeout_seconds=settings.timeout_seconds,
+        api_key=settings.api_key,
+        api_base_url=settings.api_base_url,
+        azure_api_version=settings.azure_api_version,
+        azure_deployment=settings.azure_deployment,
+        azure_use_entra_id=settings.azure_use_entra_id,
     )

@@ -9,6 +9,8 @@ SEED_FILES=(
   "diagnostic/neo4j_diagnostic_rules_seed.cypher"
   "explanation/neo4j_explanation_feedback_seed.cypher"
   "repairs/neo4j_repair_ontology_seed.cypher"
+  "problems/neo4j_problem_rules_seed.cypher"
+  "problems/neo4j_algorithm_specific_rules_seed.cypher"
 )
 
 function wait_for_neo4j() {

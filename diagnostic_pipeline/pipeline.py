@@ -4,7 +4,7 @@ from typing import List
 
 from .clang_analyzers import ClangASTAnalyzer, ClangStaticAnalyzer, ClangTidyAnalyzer
 from .evidence_builder import EvidenceBuilder
-from .exercise_knowledge_base import get_problem_by_id
+from .exercise_knowledge_base import get_problem_by_id, find_matching_problems
 from .graph_repository import InMemoryGraphRepository
 from .interfaces import Analyzer, GraphRepository, LLMClient, SemanticAnalyzer
 from .llm_client import build_llm_client_from_env
@@ -40,9 +40,7 @@ class DiagnosticPipeline:
         self.min_confidence = min_confidence
 
     def diagnose(self, request: DiagnosticRequest) -> DiagnosticReport:
-        matched_problems = self.graph_repository.match_problems(
-            request.problem_statement, top_n=3
-        )
+        matched_problems = find_matching_problems(request.problem_statement, top_n=3)
         problem_rules: List = []
         matched_problem_ids = []
         for p in matched_problems:
@@ -58,6 +56,7 @@ class DiagnosticPipeline:
         for analyzer in self.analyzers:
             try:
                 result = analyzer.analyze(request)
+                print(result)  # Debug: Print the result of the analyzer
                 evidence_sets.append(result)
                 analyzer_debug.append({'analyzer': analyzer.__class__.__name__, 'evidence_count': len(result)})
             except Exception as exc:

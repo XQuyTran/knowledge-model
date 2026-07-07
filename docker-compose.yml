@@ -72,7 +72,7 @@ services:
     networks: 
       - diagnostic-net
     tmpfs:
-      - /tmp:size=256m,nosuid,nodev
+      - /tmp:size=256m,nosuid,nodev,exec
       - /workspace:size=256m,nosuid,nodev
     security_opt:
       - no-new-privileges:true

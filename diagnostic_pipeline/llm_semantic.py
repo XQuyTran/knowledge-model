@@ -31,7 +31,8 @@ class BoundedLLMSemanticAnalyzer(SemanticAnalyzer):
                     )
                 )
             return notes if notes else self._fallback(evidence)
-        except Exception:
+        except Exception as exc:
+            print(f"Error occurred while analyzing semantic content: {exc}")
             return self._fallback(evidence)
 
     def _fallback(self, evidence: List[EvidenceInstance]) -> List[SemanticNote]:
@@ -74,16 +75,16 @@ class EvidenceBoundFeedbackLLM(FeedbackLLM):
             )
             response = self.llm_client.complete_json(system_prompt, user_prompt, schema_hint)
             lines = [
-                'Diagnosis',
+                'Diagnosis: ',
                 response.get('diagnosis', ''),
-                '',
-                'Why this is wrong',
+                '\n',
+                'Why this is wrong: ',
                 response.get('why_wrong', ''),
-                '',
-                'Consequence',
+                '\n',
+                'Consequence: ',
                 response.get('consequence', ''),
-                '',
-                'Next repair step',
+                '\n',
+                'Next repair step: ',
                 response.get('next_repair_step', ''),
             ]
             actions = response.get('repair_actions', [])
@@ -91,7 +92,8 @@ class EvidenceBoundFeedbackLLM(FeedbackLLM):
                 lines.extend(['', 'Candidate actions'])
                 lines.extend([f'- {action}' for action in actions])
             return ''.join(lines)
-        except Exception:
+        except Exception as exc:
+            print(f"Error occurred while analyzing semantic content: {exc}")
             return self._fallback(bug_id, evidence, explanation, repair_plan, semantic_notes)
 
     def _fallback(self, bug_id, evidence, explanation, repair_plan, semantic_notes) -> str:
