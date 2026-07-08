@@ -4,178 +4,243 @@
       "case_id": "off_by_one_01",
       "detected_bug": "bug.array_out_of_bounds",
       "confidence": 0.955,
-      "detected": false,
-      "feedback": "DiagnosisMost likely bug: bug.array_out_of_boundsEvidence- Clang AST found array indexing near a possibly inclusive upper-bound loop. at line 4- Test 'sample' produced unexpected output.- Clang AST found a for-loop whose source contains a non-strict upper-bound comparison. at line 6Semantic analysis- The loop and index expression are likely inconsistent with the valid range of the sequence.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the o",
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 3,
-      "elapsed_seconds": 2.72
+      "elapsed_seconds": 5.03
     },
     {
       "case_id": "off_by_one_02",
       "detected_bug": "bug.array_out_of_bounds",
       "confidence": 0.955,
-      "detected": false,
-      "feedback": "DiagnosisMost likely bug: bug.array_out_of_boundsEvidence- Clang AST found array indexing near a possibly inclusive upper-bound loop. at line 3- Test 'sample' produced unexpected output.- Clang AST found a for-loop whose source contains a non-strict upper-bound comparison. at line 5Semantic analysis- The loop and index expression are likely inconsistent with the valid range of the sequence.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the o",
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 3,
-      "elapsed_seconds": 2.67
+      "elapsed_seconds": 3.07
     },
     {
       "case_id": "null_deref_01",
       "detected_bug": "bug.null_dereference",
       "confidence": 0.904,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.null_dereferenceEvidence- Static analyzer reports a possible null dereference. at line 4Semantic analysis- The code appears to use a pointer before proving that it refers to a valid object.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code repair.Next repair step1. Locate the dereference. at line 42.",
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 1,
-      "elapsed_seconds": 0.91
+      "elapsed_seconds": 1.87
     },
     {
       "case_id": "memory_leak_01",
       "detected_bug": "bug.memory_leak",
       "confidence": 0.73,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.memory_leakEvidence- Code uses 'new' without matching 'delete', suggesting a memory leak. at line 3Semantic analysis- The code appears to use a pointer before proving that it refers to a valid object.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code repair.Next repair step1. Locate the allocation si",
-      "evidence_count": 2,
-      "elapsed_seconds": 2.71
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 1,
+      "elapsed_seconds": 3.15
     },
     {
       "case_id": "missing_return_01",
       "detected_bug": "bug.missing_return",
-      "confidence": 0.792,
+      "confidence": 0.99,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.missing_returnEvidence- A non-void function body lacks a return statement, causing undefined behavior. at line 2Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code repair.Next repair step1. Find the non-void function path with no return. at line 22. Choose the correct value for that path. at line 23. ",
-      "evidence_count": 2,
-      "elapsed_seconds": 3.79
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 3,
+      "elapsed_seconds": 3.24
     },
     {
       "case_id": "array_oob_01",
       "detected_bug": "bug.array_out_of_bounds",
       "confidence": 0.955,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.array_out_of_boundsEvidence- Clang AST found array indexing near a possibly inclusive upper-bound loop. at line 3- Test 'sample' produced unexpected output.- Clang AST found a for-loop whose source contains a non-strict upper-bound comparison. at line 4Semantic analysis- The loop and index expression are likely inconsistent with the valid range of the sequence.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the o",
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 3,
-      "elapsed_seconds": 2.69
+      "elapsed_seconds": 3.15
     },
     {
       "case_id": "infinite_loop_01",
       "detected_bug": "bug.wrong_loop_condition",
-      "confidence": 0.719,
+      "confidence": 0.95,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.wrong_loop_conditionEvidence- A while loop lacks any obvious update to its control variable. at line 4Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code repair.Next repair step1. Identify the loop condition that causes incorrect iteration. at line 42. Determine the correct bound or increment. at line",
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 2,
-      "elapsed_seconds": 4.74
+      "elapsed_seconds": 5.17
     },
     {
       "case_id": "use_after_free_01",
       "detected_bug": "bug.use_after_free",
       "confidence": 0.899,
       "detected": true,
-      "feedback": "DiagnosisMost likely bug: bug.use_after_freeEvidence- Static analyzer reports use after release. at line 5Semantic analysis- The code appears to use a pointer before proving that it refers to a valid object.- The code likely continues using a resource after its lifetime has ended.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code",
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 2,
-      "elapsed_seconds": 0.92
+      "elapsed_seconds": 1.92
     },
     {
       "case_id": "recursion_no_progress_01",
-      "detected_bug": "bug.null_dereference",
-      "confidence": 0.64,
-      "detected": false,
-      "feedback": "DiagnosisMost likely bug: bug.null_dereferenceEvidence- Clang AST found pointer dereference without an obvious null guard in source text. at line 3Semantic analysis- The code appears to use a pointer before proving that it refers to a valid object.Why this is wrong- Locate the statement that produced the strongest diagnostic evidence.- Explain how the observed behavior conflicts with the problem requirement.- Connect the diagnosis to the smallest safe source-code repair.Next repair step1. Locate",
-      "evidence_count": 2,
-      "elapsed_seconds": 3.79
+      "detected_bug": "bug.no_recursive_progress",
+      "confidence": 0.754,
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 3,
+      "elapsed_seconds": 3.6
     },
     {
       "case_id": "correct_sum_01",
       "detected_bug": null,
       "confidence": 0,
       "detected": true,
-      "feedback": "No high-confidence diagnosis was found. Add focused tests or inspect the reported compiler/runtime evidence.",
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
       "evidence_count": 0,
-      "elapsed_seconds": 2.7
+      "elapsed_seconds": 3.44
     },
     {
       "case_id": "bubble_sort_oob_01",
-      "detected_bug": null,
-      "confidence": 0,
-      "detected": false,
-      "feedback": "No high-confidence diagnosis was found. Add focused tests or inspect the reported compiler/runtime evidence.",
-      "evidence_count": 0,
-      "elapsed_seconds": 2.73
+      "detected_bug": "bug.array_out_of_bounds",
+      "confidence": 0.915,
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 2,
+      "elapsed_seconds": 5.27
     },
     {
       "case_id": "binary_search_wrong_01",
-      "detected_bug": null,
-      "confidence": 0,
-      "detected": false,
-      "feedback": "No high-confidence diagnosis was found. Add focused tests or inspect the reported compiler/runtime evidence.",
-      "evidence_count": 0,
-      "elapsed_seconds": 2.74
+      "detected_bug": "bug.infinite_loop",
+      "confidence": 0.756,
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 2,
+      "elapsed_seconds": 5.68
     },
     {
       "case_id": "factorial_rec_missing_return_01",
-      "detected_bug": "bug.array_out_of_bounds",
-      "confidence": 0.915,
-      "detected": false,
-      "feedback": "DiagnosisMost likely bug: bug.array_out_of_boundsEvidence- Clang AST found array indexing near a possibly inclusive upper-bound loop.- Clang AST found a for-loop whose source contains a non-strict upper-bound comparison. at line 3Semantic analysis- The loop and index expression are likely inconsistent with the valid range of the sequence.- The code appears to use a pointer before proving that it refers to a valid object.Why this is wrong- Locate the statement that produced the strongest diagnost",
-      "evidence_count": 4,
-      "elapsed_seconds": 3.87
+      "detected_bug": "bug.missing_return",
+      "confidence": 0.893,
+      "detected": true,
+      "feedback": "Diagnosis: [mock] see rule-based diagnosis\nWhy this is wrong: [mock]\nConsequence: [mock]\nNext repair step: [mock]",
+      "evidence_count": 3,
+      "elapsed_seconds": 3.62
     }
   ],
   "llm_only": [
     {
       "case_id": "off_by_one_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "off_by_one_02",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "null_deref_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "memory_leak_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "missing_return_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "array_oob_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "infinite_loop_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "use_after_free_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "recursion_no_progress_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "correct_sum_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": true,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "bubble_sort_oob_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "binary_search_wrong_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     },
     {
       "case_id": "factorial_rec_missing_return_01",
-      "error": "LLM not configured; set LLM environment variables"
+      "detected_bug": null,
+      "confidence": 0,
+      "detected": false,
+      "feedback": "[mock LLM] no diagnosis",
+      "evidence_count": 0,
+      "elapsed_seconds": 0.0
     }
   ],
   "summary": {
-    "hybrid_accuracy": "7/13",
-    "llm_accuracy": "0/13",
-    "hybrid_avg_time_s": 2.844615384615385,
+    "hybrid_accuracy": "13/13",
+    "llm_accuracy": "1/13",
+    "hybrid_avg_time_s": 3.7084615384615387,
     "llm_avg_time_s": 0.0
   }
 }

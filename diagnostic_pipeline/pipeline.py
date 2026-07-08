@@ -95,10 +95,17 @@ class DiagnosticPipeline:
         candidate_bugs = [candidate.bug_id for candidate in ranked[:5]]
         logger.info("pipeline.ranking", extra={"top_bug": top_bug.bug_id if top_bug else None, "score": top_bug.score if top_bug else None})
 
+        # LLM steps run AFTER detection (top_bug) is complete and are used only for
+        # narrative output. A flaky/malformed LLM response must not discard a valid
+        # diagnosis, so failures degrade gracefully instead of aborting the pipeline.
         t0 = time.time()
         logger.info("llm.semantic.start", extra={"candidates": candidate_bugs})
-        semantic_notes = self.semantic_analyzer.analyze(request, evidence, candidate_bugs, concepts)
-        logger.info("llm.semantic.finish", extra={"duration_ms": int((time.time() - t0) * 1000), "notes": len(semantic_notes)})
+        try:
+            semantic_notes = self.semantic_analyzer.analyze(request, evidence, candidate_bugs, concepts)
+            logger.info("llm.semantic.finish", extra={"duration_ms": int((time.time() - t0) * 1000), "notes": len(semantic_notes)})
+        except Exception:
+            semantic_notes = []
+            logger.exception("llm.semantic.error", extra={"duration_ms": int((time.time() - t0) * 1000)})
 
         explanation = None
         repair_plan = None
@@ -111,15 +118,21 @@ class DiagnosticPipeline:
 
         t1 = time.time()
         logger.info("llm.feedback.start", extra={"top_bug": top_bug.bug_id if top_bug else None})
-        feedback = self.feedback_llm.generate_feedback(
-            request,
-            top_bug.bug_id if top_bug else None,
-            top_bug.evidence if top_bug else evidence,
-            explanation,
-            repair_plan,
-            semantic_notes,
-        )
-        logger.info("llm.feedback.finish", extra={"duration_ms": int((time.time() - t1) * 1000), "chars": len(feedback) if feedback else 0})
+        try:
+            feedback = self.feedback_llm.generate_feedback(
+                request,
+                top_bug.bug_id if top_bug else None,
+                top_bug.evidence if top_bug else evidence,
+                explanation,
+                repair_plan,
+                semantic_notes,
+            )
+            logger.info("llm.feedback.finish", extra={"duration_ms": int((time.time() - t1) * 1000), "chars": len(feedback) if feedback else 0})
+        except Exception:
+            feedback = (
+                f"Detected: {top_bug.bug_id}" if top_bug else "No high-confidence bug detected."
+            ) + " (LLM feedback unavailable.)"
+            logger.exception("llm.feedback.error", extra={"duration_ms": int((time.time() - t1) * 1000)})
 
         logger.info("pipeline.finish", extra={"duration_ms": int((time.time() - pipeline_start) * 1000), "top_bug": top_bug.bug_id if top_bug else None})
         return DiagnosticReport(

@@ -65,9 +65,16 @@ def build_graph_repository():
         return InMemoryGraphRepository(), None
 
 
+def build_llm_client():
+    if os.getenv("USE_CLAUDE_LOCAL", "false").lower() in {"1", "true", "yes"}:
+        from diagnostic_pipeline.claude_cli_client import ClaudeCLIClient
+        return ClaudeCLIClient()
+    return build_llm_client_from_env()
+
+
 def build_pipeline():
     graph_repository, driver = build_graph_repository()
-    pipeline = DiagnosticPipeline(graph_repository=graph_repository, llm_client=build_llm_client_from_env())
+    pipeline = DiagnosticPipeline(graph_repository=graph_repository, llm_client=build_llm_client())
     return pipeline, driver
 
 
@@ -95,6 +102,7 @@ def index() -> FileResponse:
 def health() -> dict[str, Any]:
     return {
         "status": "ok",
+        "llm_mode": type(pipeline.llm_client).__name__,
         "llm_configured": build_llm_client_from_env() is not None,
         "neo4j_mode": os.getenv("USE_NEO4J", "true"),
     }

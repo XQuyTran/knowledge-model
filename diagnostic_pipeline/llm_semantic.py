@@ -18,13 +18,18 @@ def _resolve_model_name() -> str:
         os.getenv("AZURE_OPENAI_DEPLOYMENT")
         or os.getenv("OPENAI_MODEL")
         or os.getenv("LLM_MODEL")
+        or os.getenv("CLAUDE_LOCAL_MODEL")
     )
-    if not model:
-        raise RuntimeError(
-            "Missing LLM model/deployment configuration. "
-            "Set AZURE_OPENAI_DEPLOYMENT for Azure or OPENAI_MODEL/LLM_MODEL for OpenAI."
-        )
-    return model
+    if model:
+        return model
+    # Local `claude` CLI picks its own default model; return a harmless placeholder
+    # (ClaudeCLIClient only forwards --model for real claude-* names).
+    if os.getenv("USE_CLAUDE_LOCAL", "false").lower() in {"1", "true", "yes"}:
+        return "claude-local"
+    raise RuntimeError(
+        "Missing LLM model/deployment configuration. "
+        "Set AZURE_OPENAI_DEPLOYMENT for Azure or OPENAI_MODEL/LLM_MODEL for OpenAI."
+    )
 
 
 def _parse_json_object(content: str) -> dict[str, Any]:
