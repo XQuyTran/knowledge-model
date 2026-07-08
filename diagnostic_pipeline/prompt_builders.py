@@ -1,4 +1,3 @@
-from __future__ import annotations
 
 import json
 from typing import List
@@ -6,17 +5,17 @@ from typing import List
 from .models import DiagnosticRequest, EvidenceInstance, ExplanationSelection, RepairPlanSelection
 
 COMMON_SYSTEM_PROMPT = (
-    "You are an ontology-grounded programming diagnostic expert.",
-    "Your task is to diagnose a student's programming submission using only the provided context.",
-    "STRICT RULES",
-    "1. Use only supplied evidence, concepts, candidate bugs, explanation steps, and repair steps.",
-    "2. Never invent compiler warnings, runtime failures, bug IDs, concepts, or fixes that are not present in the provided context.",
-    "3. If evidence is insufficient, explicitly say that confidence is limited.",
-    "4. Explain the causal chain when possible.",
-    "5. Keep the explanation educational and concrete.",
-    "6. Return JSON only.",
-    "Reasoning chain:",
-    "Evidence -> Concept -> Diagnostic Rule -> Bug -> Consequence -> Repair Action",
+    "You are an ontology-grounded programming diagnostic expert. "
+    "Your task is to diagnose a student's programming submission using only the provided context. "
+    "STRICT RULES: "
+    "1. Use only supplied evidence, concepts, candidate bugs, explanation steps, and repair steps. "
+    "2. Never invent compiler warnings, runtime failures, bug IDs, concepts, or fixes that are not present in the provided context. "
+    "3. If evidence is insufficient, explicitly say that confidence is limited. "
+    "4. Explain the causal chain when possible. "
+    "5. Keep the explanation educational and concrete. "
+    "6. Return JSON only. "
+    "Reasoning chain: "
+    "Evidence -> Concept -> Diagnostic Rule -> Bug -> Consequence -> Repair Action."
 )
 
 
@@ -27,9 +26,9 @@ def build_semantic_analysis_prompts(
     concept_ids: List[str],
 ):
     system_prompt = COMMON_SYSTEM_PROMPT + (
-        "Task:",
-        "Analyze the semantic mismatch between the problem requirement and the source code. ",
-        "Use evidence to explain why the candidate bugs may or may not be supported.",
+        "Task: "
+        "Analyze the semantic mismatch between the problem requirement and the source code. "
+        "Use evidence to explain why the candidate bugs may or may not be supported."
     )
     user_payload = {
         'problem_statement': request.problem_statement,
@@ -75,9 +74,9 @@ def build_feedback_prompts(
     semantic_notes,
 ):
     system_prompt = COMMON_SYSTEM_PROMPT + (
-        "Task:",
-        "Generate concise, educational feedback for the student. ",
-        "Explain what is wrong, why it happens, what consequence it has, and what repair step should come next.",
+        "Task: "
+        "Generate concise, educational feedback for the student. "
+        "Explain what is wrong, why it happens, what consequence it has, and what repair step should come next."
     )
     user_payload = {
         'problem_statement': request.problem_statement,
