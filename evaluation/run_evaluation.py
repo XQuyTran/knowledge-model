@@ -18,14 +18,36 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from evaluation.benchmark_cases import BENCHMARK_CASES
 from diagnostic_pipeline import DiagnosticRequest, TestCase
 from diagnostic_pipeline.pipeline import DiagnosticPipeline
-from diagnostic_pipeline.llm_client import OpenAICompatibleLLMClient
+from diagnostic_pipeline.llm_client import build_llm_client_from_env
+from diagnostic_pipeline.llm_semantic import _resolve_model_name, _parse_json_object
 
 
 REPORT_DIR = Path(__file__).parent / "results"
 
 
+# LLM backend. Detection accuracy is 100% rule-based; the LLM only writes narrative
+# feedback (and drives the LLM-only baseline). Default: an offline deterministic mock.
+# Set USE_CLAUDE_LOCAL=true to use the local `claude` CLI instead — this also turns the
+# LLM-only column into a real comparison (slower, uses your Claude Code quota).
+if os.getenv("USE_CLAUDE_LOCAL", "false").lower() in {"1", "true", "yes"}:
+    from diagnostic_pipeline.claude_cli_client import ClaudeCLIClient
+    MOCK_LLM = ClaudeCLIClient()
+else:
+    from diagnostic_pipeline.mock_llm import MockLLMClient
+    MOCK_LLM = MockLLMClient()
+
+
+def _is_detected(case: dict, detected_bug) -> bool:
+    """A detection is correct if it matches the expected bug or any acceptable alias
+    (some defects have overlapping labels, e.g. off-by-one vs array-out-of-bounds)."""
+    if not case["expected_bug"]:
+        return detected_bug is None
+    acceptable = {case["expected_bug"], *case.get("acceptable_bugs", [])}
+    return detected_bug in acceptable
+
+
 def build_hybrid_report(case: dict) -> dict:
-    pipe = DiagnosticPipeline()
+    pipe = DiagnosticPipeline(llm_client=MOCK_LLM)
     request = DiagnosticRequest(
         problem_statement=case["problem"],
         source_code=case["source_code"],
@@ -36,7 +58,7 @@ def build_hybrid_report(case: dict) -> dict:
     elapsed = time.time() - start
 
     detected_bug = report.top_bug.bug_id if report.top_bug else None
-    detected = detected_bug == case["expected_bug"] if case["expected_bug"] else detected_bug is None
+    detected = _is_detected(case, detected_bug)
 
     return {
         "detected_bug": detected_bug,
@@ -49,9 +71,8 @@ def build_hybrid_report(case: dict) -> dict:
 
 
 def build_llm_only_report(case: dict) -> dict:
-    try:
-        llm = OpenAICompatibleLLMClient.from_env()
-    except RuntimeError:
+    llm = MOCK_LLM
+    if llm is None:
         return {"error": "LLM not configured; set LLM environment variables"}
 
     prompt = f"""You are a code diagnostic expert. Analyze the following C++ program.
@@ -68,10 +89,15 @@ Identify if there is a bug. Return JSON:
 
     start = time.time()
     try:
-        response = llm.complete_json("You are a code diagnostic expert. Return JSON only.", prompt, '{"has_bug": bool, "bug_type": "string or null", "diagnosis": "string", "next_step": "string"}')
+        raw = llm.responses.create(
+            model=_resolve_model_name(),
+            instructions="You are a code diagnostic expert. Return JSON only.",
+            input=prompt,
+        )
+        response = _parse_json_object(raw.output_text or "{}")
         elapsed = time.time() - start
         detected_bug = response.get("bug_type")
-        detected = detected_bug == case["expected_bug"] if case["expected_bug"] else detected_bug is None
+        detected = _is_detected(case, detected_bug)
         return {
             "detected_bug": detected_bug,
             "confidence": 0,

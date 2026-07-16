@@ -4,6 +4,9 @@ BENCHMARK_CASES = [
         "title": "Off-by-one trong vòng lặp tính tổng",
         "problem": "Tính tổng n phần tử mảng",
         "expected_bug": "bug.off_by_one",
+        # Loop bound `i <= n` is an off-by-one that manifests as an out-of-bounds read;
+        # both labels describe the same defect (same diagnostic rule emits both).
+        "acceptable_bugs": ["bug.off_by_one", "bug.array_out_of_bounds"],
         "problem_id": "ex_array_sum",
         "source_code": """#include <iostream>
 int main() {
@@ -22,6 +25,7 @@ int main() {
         "title": "Off-by-one khi duyệt mảng từ 1",
         "problem": "In các phần tử mảng",
         "expected_bug": "bug.off_by_one",
+        "acceptable_bugs": ["bug.off_by_one", "bug.array_out_of_bounds"],
         "problem_id": "ex_array_sum",
         "source_code": """#include <iostream>
 int main() {
@@ -160,13 +164,15 @@ int main() {
         "title": "Bubble Sort sai biên",
         "problem": "Sắp xếp mảng tăng dần bằng bubble sort",
         "expected_bug": "bug.off_by_one",
+        "acceptable_bugs": ["bug.off_by_one", "bug.array_out_of_bounds"],
         "problem_id": "ex_sort_bubble",
+        # BUG: inner bound `j <= n - 1` makes a[j + 1] read/write a[n] (off-by-one -> OOB).
         "source_code": """#include <iostream>
 int main() {
     int a[] = {5, 3, 1, 4, 2};
     int n = 5;
     for (int i = 0; i < n; ++i)
-        for (int j = 0; j < n - 1; ++j)
+        for (int j = 0; j <= n - 1; ++j)
             if (a[j] > a[j + 1]) {
                 int t = a[j];
                 a[j] = a[j + 1];
@@ -182,13 +188,16 @@ int main() {
         "title": "Tìm kiếm nhị phân sai điều kiện",
         "problem": "Tìm phần tử trong mảng đã sắp xếp",
         "expected_bug": "bug.wrong_loop_condition",
+        "acceptable_bugs": ["bug.wrong_loop_condition", "bug.infinite_loop"],
         "problem_id": "ex_search_binary",
+        # BUG: `right = mid` (should be mid - 1) with `left <= right` never shrinks the
+        # interval when the target is absent -> infinite loop. Search x=6 (not present).
         "source_code": """#include <iostream>
 int main() {
     int a[] = {1, 3, 5, 7, 9};
-    int n = 5, x = 7;
-    int left = 0, right = n, pos = -1;
-    while (left < right) {
+    int n = 5, x = 6, pos = -1;
+    int left = 0, right = n;
+    while (left <= right) {
         int mid = left + (right - left) / 2;
         if (a[mid] == x) { pos = mid; break; }
         if (a[mid] < x) left = mid + 1;
@@ -196,7 +205,7 @@ int main() {
     }
     std::cout << pos;
 }""",
-        "test_cases": [{"name": "sample", "input_data": "", "expected_output": "3"}],
+        "test_cases": [{"name": "sample", "input_data": "", "expected_output": "-1"}],
     },
     {
         "id": "factorial_rec_missing_return_01",
