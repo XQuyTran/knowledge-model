@@ -48,7 +48,11 @@ class ClaudeCLIClient:
         self.responses = _Responses(self)
 
     def _complete(self, instructions: str, user_input: str, model=None) -> _Resp:
-        cmd = [self.binary, "-p", "--output-format", "json"]
+        # ponytail: skip user/project settings (plugins, hooks) and all MCP servers.
+        # Halves cold-start (~11s -> ~5.5s/call); OAuth login is unaffected. --bare would
+        # be faster still but forces ANTHROPIC_API_KEY, breaking the reuse-my-login point.
+        cmd = [self.binary, "-p", "--output-format", "json",
+               "--setting-sources", "", "--strict-mcp-config"]
         if instructions:
             cmd += ["--system-prompt", instructions]
         chosen = model or self.model

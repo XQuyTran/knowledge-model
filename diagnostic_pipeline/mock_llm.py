@@ -15,6 +15,11 @@ class _MockResp:
 class _MockResponses:
     def create(self, model=None, instructions="", input="", **_):
         instr = instructions or ""
+        # Merged path: schema hint carries BOTH sections, so answer both at once.
+        if "semantic_notes" in instr and "why_wrong" in instr:
+            return _MockResp('{"semantic_notes": [], "diagnosis": "[mock] see rule-based diagnosis", '
+                             '"why_wrong": "[mock]", "consequence": "[mock]", '
+                             '"next_repair_step": "[mock]", "repair_actions": []}')
         if "semantic_notes" in instr:
             return _MockResp('{"semantic_notes": []}')
         if "why_wrong" in instr:

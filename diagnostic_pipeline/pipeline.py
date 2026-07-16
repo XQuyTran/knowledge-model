@@ -10,7 +10,7 @@ from .exercise_knowledge_base import get_problem_by_id, find_matching_problems
 from .graph_repository import InMemoryGraphRepository
 from .interfaces import Analyzer, GraphRepository, SemanticAnalyzer
 from .llm_client import build_llm_client_from_env
-from .llm_semantic import BoundedLLMSemanticAnalyzer, EvidenceBoundFeedbackLLM
+from .llm_semantic import BoundedLLMSemanticAnalyzer, EvidenceBoundFeedbackLLM, analyze_and_generate_feedback
 from .local_sandbox import LocalSandboxRunner, SanitizerRunner
 from .models import DiagnosticReport, DiagnosticRequest
 from .ranking import BugRankingEngine
@@ -45,6 +45,9 @@ class DiagnosticPipeline:
         self.semantic_analyzer = semantic_analyzer or BoundedLLMSemanticAnalyzer(llm_client=llm_client)
         self.graph_repository = graph_repository or InMemoryGraphRepository()
         self.feedback_llm = feedback_llm or EvidenceBoundFeedbackLLM(llm_client=llm_client)
+        # Merge semantic + feedback into ONE LLM call unless a caller injected a custom
+        # analyzer/feedback component (then we honour the two-call path for compatibility).
+        self._merged_llm = semantic_analyzer is None and feedback_llm is None
         self.evidence_builder = EvidenceBuilder()
         self.ranking_engine = BugRankingEngine()
         self.min_confidence = min_confidence
@@ -98,15 +101,8 @@ class DiagnosticPipeline:
         # LLM steps run AFTER detection (top_bug) is complete and are used only for
         # narrative output. A flaky/malformed LLM response must not discard a valid
         # diagnosis, so failures degrade gracefully instead of aborting the pipeline.
-        t0 = time.time()
-        logger.info("llm.semantic.start", extra={"candidates": candidate_bugs})
-        try:
-            semantic_notes = self.semantic_analyzer.analyze(request, evidence, candidate_bugs, concepts)
-            logger.info("llm.semantic.finish", extra={"duration_ms": int((time.time() - t0) * 1000), "notes": len(semantic_notes)})
-        except Exception:
-            semantic_notes = []
-            logger.exception("llm.semantic.error", extra={"duration_ms": int((time.time() - t0) * 1000)})
-
+        # Explanation/repair selection is graph-only and does not depend on the LLM,
+        # so it runs first — that lets the merged path fold both LLM tasks into one call.
         explanation = None
         repair_plan = None
         if top_bug:
@@ -116,23 +112,44 @@ class DiagnosticPipeline:
             if repair_plan:
                 repair_plan = self._attach_locations(repair_plan, top_bug.evidence)
 
-        t1 = time.time()
-        logger.info("llm.feedback.start", extra={"top_bug": top_bug.bug_id if top_bug else None})
-        try:
-            feedback = self.feedback_llm.generate_feedback(
-                request,
-                top_bug.bug_id if top_bug else None,
-                top_bug.evidence if top_bug else evidence,
-                explanation,
-                repair_plan,
-                semantic_notes,
-            )
-            logger.info("llm.feedback.finish", extra={"duration_ms": int((time.time() - t1) * 1000), "chars": len(feedback) if feedback else 0})
-        except Exception:
-            feedback = (
-                f"Detected: {top_bug.bug_id}" if top_bug else "No high-confidence bug detected."
-            ) + " (LLM feedback unavailable.)"
-            logger.exception("llm.feedback.error", extra={"duration_ms": int((time.time() - t1) * 1000)})
+        bug_id = top_bug.bug_id if top_bug else None
+        feedback_evidence = top_bug.evidence if top_bug else evidence
+        no_feedback = (
+            f"Detected: {bug_id}" if top_bug else "No high-confidence bug detected."
+        ) + " (LLM feedback unavailable.)"
+
+        if self._merged_llm:
+            t0 = time.time()
+            logger.info("llm.combined.start", extra={"candidates": candidate_bugs, "top_bug": bug_id})
+            try:
+                semantic_notes, feedback = analyze_and_generate_feedback(
+                    self.llm_client, request, evidence, candidate_bugs, concepts,
+                    bug_id, feedback_evidence, explanation, repair_plan,
+                )
+                logger.info("llm.combined.finish", extra={"duration_ms": int((time.time() - t0) * 1000), "notes": len(semantic_notes), "chars": len(feedback) if feedback else 0})
+            except Exception:
+                semantic_notes, feedback = [], no_feedback
+                logger.exception("llm.combined.error", extra={"duration_ms": int((time.time() - t0) * 1000)})
+        else:
+            t0 = time.time()
+            logger.info("llm.semantic.start", extra={"candidates": candidate_bugs})
+            try:
+                semantic_notes = self.semantic_analyzer.analyze(request, evidence, candidate_bugs, concepts)
+                logger.info("llm.semantic.finish", extra={"duration_ms": int((time.time() - t0) * 1000), "notes": len(semantic_notes)})
+            except Exception:
+                semantic_notes = []
+                logger.exception("llm.semantic.error", extra={"duration_ms": int((time.time() - t0) * 1000)})
+
+            t1 = time.time()
+            logger.info("llm.feedback.start", extra={"top_bug": bug_id})
+            try:
+                feedback = self.feedback_llm.generate_feedback(
+                    request, bug_id, feedback_evidence, explanation, repair_plan, semantic_notes,
+                )
+                logger.info("llm.feedback.finish", extra={"duration_ms": int((time.time() - t1) * 1000), "chars": len(feedback) if feedback else 0})
+            except Exception:
+                feedback = no_feedback
+                logger.exception("llm.feedback.error", extra={"duration_ms": int((time.time() - t1) * 1000)})
 
         logger.info("pipeline.finish", extra={"duration_ms": int((time.time() - pipeline_start) * 1000), "top_bug": top_bug.bug_id if top_bug else None})
         return DiagnosticReport(

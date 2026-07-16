@@ -112,3 +112,76 @@ def build_feedback_prompts(
         indent=2,
     )
     return system_prompt, json.dumps(user_payload, indent=2), schema_hint
+
+
+def build_combined_prompts(
+    request: DiagnosticRequest,
+    bug_id: str | None,
+    evidence: List[EvidenceInstance],
+    candidate_bugs: List[str],
+    concept_ids: List[str],
+    explanation: ExplanationSelection | None,
+    repair_plan: RepairPlanSelection | None,
+):
+    """One prompt that produces BOTH the semantic analysis and the student feedback.
+
+    Merges the two former LLM round-trips into a single call. The two tasks share
+    almost all context (problem, source, evidence, candidate bugs), so folding them
+    saves a whole model round-trip with no loss of information.
+    """
+    system_prompt = COMMON_SYSTEM_PROMPT + (
+        "Task: In ONE response do both of the following. "
+        "(A) Analyze the semantic mismatch between the problem requirement and the source code, "
+        "using evidence to explain why the candidate bugs may or may not be supported. "
+        "(B) Generate concise, educational feedback for the student: what is wrong, why it happens, "
+        "its consequence, and the next repair step. Make (B) consistent with your own (A)."
+    )
+    user_payload = {
+        'problem_statement': request.problem_statement,
+        'source_code': request.source_code,
+        'bug_id': bug_id,
+        'evidence': [
+            {
+                'evidence_id': e.evidence_id,
+                'source': e.source,
+                'description': e.description,
+                'line_start': e.location.line_start if e.location else None,
+            }
+            for e in evidence
+        ],
+        'candidate_bugs': candidate_bugs,
+        'concept_ids': concept_ids,
+        'explanation_steps': [step.__dict__ for step in (explanation.steps if explanation else [])],
+        'repair_steps': [
+            {
+                'order': step.order,
+                'description': step.description,
+                'line_start': step.location.line_start if step.location else None,
+            }
+            for step in (repair_plan.steps if repair_plan else [])
+        ],
+        'repair_actions': repair_plan.actions if repair_plan else [],
+    }
+    schema_hint = json.dumps(
+        {
+            'semantic_notes': [
+                {
+                    'claim': 'string',
+                    'confidence': 0.0,
+                    'supporting_lines': [1, 2],
+                    'causal_chain': [
+                        'Evidence statement',
+                        'Concept statement',
+                        'Bug consequence statement',
+                    ],
+                }
+            ],
+            'diagnosis': 'string',
+            'why_wrong': 'string',
+            'consequence': 'string',
+            'next_repair_step': 'string',
+            'repair_actions': ['string'],
+        },
+        indent=2,
+    )
+    return system_prompt, json.dumps(user_payload, indent=2), schema_hint
