@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from .exercise_knowledge_base import find_matching_problems, get_problem_by_id
+from .exercise_knowledge_base import find_matching_problems
 from .interfaces import GraphRepository
 from .models import (
     ExplanationSelection,
@@ -23,15 +23,22 @@ class InMemoryGraphRepository(GraphRepository):
         'ev.memory.release_then_use': [('rule.memory.use_after_free.flow', ['bug.use_after_free', 'bug.dangling_pointer'], 0.96)],
         'ev.memory.sanitizer_uaf': [('rule.memory.uaf.sanitizer', ['bug.use_after_free'], 0.99)],
         'ev.memory.sanitizer_leak': [('rule.memory.leak.sanitizer', ['bug.memory_leak'], 0.99)],
+        'ev.memory.static_leak': [('rule.memory.leak.static', ['bug.memory_leak'], 0.93)],
         'ev.memory.alloc_without_release': [('rule.memory.leak.alloc_no_release', ['bug.memory_leak'], 0.87)],
         'ev.function.warn_nonvoid': [('rule.function.missing_return.compiler', ['bug.missing_return'], 0.98)],
         'ev.recursion.no_progress': [('rule.recursion.no_progress', ['bug.no_recursive_progress'], 0.93)],
+        'ev.recursion.stack_overflow': [('rule.recursion.stack_overflow', ['bug.no_recursive_progress'], 0.97)],
         'ev.move.use_after_move': [('rule.move.use_after_move', ['bug.use_after_move'], 0.85)],
         'ev.oop.delete_base_no_virtual': [('rule.oop.delete_base_no_virtual', ['bug.missing_virtual_destructor'], 0.96)],
         'ev.format.printf_type_mismatch': [('rule.format.specifier_mismatch', ['bug.format_specifier_mismatch'], 0.95)],
         'ev.uninitialized.value': [('rule.memory.uninitialized', ['bug.uninitialized_value'], 0.85)],
         'ev.compile.error': [('rule.compile.error', ['bug.compile_error'], 0.99)],
         'ev.loop.no_progress': [('rule.loop.no_progress', ['bug.wrong_loop_condition', 'bug.infinite_loop'], 0.88)],
+        'ev.loop.timeout': [('rule.loop.timeout', ['bug.infinite_loop', 'bug.wrong_loop_condition'], 0.90)],
+        'ev.sort.insertion.missed_zero_index': [('rule.sort.insertion.off_by_one', ['bug.off_by_one', 'bug.wrong_loop_condition'], 0.88)],
+        'ev.sort.insertion.wrong_insert_position': [('rule.sort.insertion.wrong_insert', ['bug.array_out_of_bounds', 'bug.wrong_loop_condition'], 0.78)],
+        'ev.sort.insertion.missing_decrement': [('rule.sort.insertion.infinite_loop', ['bug.infinite_loop', 'bug.wrong_loop_condition'], 0.90)],
+        'ev.sort.bubble.wrong_order': [('rule.sort.bubble.wrong_order', ['bug.wrong_loop_condition'], 0.72)],
     }
 
     PROBLEM_RULES = {
@@ -101,8 +108,8 @@ class InMemoryGraphRepository(GraphRepository):
             'bug.use_after_move': ('repair.move_semantic_safety', 'MoveSemanticSafetyRepair', ['Locate the move operation.', 'Find later reads of the moved-from object.', 'Reinitialize the object or avoid depending on its old value.']),
             'bug.missing_virtual_destructor': ('repair.polymorphic_lifetime', 'PolymorphicLifetimeRepair', ['Locate deletion through a base pointer.', 'Check whether the base class is polymorphic.', 'Add a virtual destructor to the base class.']),
             'bug.format_specifier_mismatch': ('repair.format_type_safety', 'FormatTypeSafetyRepair', ['Locate the formatting call.', 'Match each placeholder to its argument type.', 'Correct the specifier or use type-safe formatting.']),
-            'bug.wrong_loop_condition': ('repair.loop_condition', 'LoopConditionRepair', ['Identify the loop condition that causes incorrect iteration.', 'Determine the correct bound or increment.', 'Fix the condition and verify with test cases.']),
-            'bug.infinite_loop': ('repair.infinite_loop', 'InfiniteLoopRepair', ['Locate the loop that does not terminate.', 'Check if the loop variable is updated correctly.', 'Add or fix the update statement inside the loop.']),
+            'bug.wrong_loop_condition': ('repair.loop_condition', 'LoopConditionRepair', ['Identify the loop condition that causes incorrect iteration.', 'Determine the correct bound, comparator, or update.', 'Fix the condition and verify with test cases.']),
+            'bug.infinite_loop': ('repair.infinite_loop', 'InfiniteLoopRepair', ['Locate the loop that does not terminate.', 'Check whether the loop variable is updated correctly.', 'Add or fix the update statement inside the loop.']),
             'bug.uninitialized_value': ('repair.initialize_variable', 'InitializeVariableRepair', ['Locate the variable read before initialization.', 'Assign a default value at declaration.', 'Verify the value is correct for all code paths.']),
             'bug.compile_error': ('repair.fix_syntax', 'FixSyntaxRepair', ['Read the compiler error message.', 'Fix the reported line.', 'Recompile and verify.']),
         }
@@ -141,24 +148,26 @@ class Neo4jGraphRepository(GraphRepository):
 
     def match_problem_rules(self, problem_id: str) -> List[RuleHit]:
         query = """
-        MATCH (p:Problem {id: $problem_id})-[:HAS_ALGORITHM]->(algo:Algorithm)
-        OPTIONAL MATCH (p)-[:HAS_COMMON_BUG]->(b:ProgrammingBug)
-        RETURN algo.id AS algorithm_id,
-               collect(DISTINCT b.id) AS bug_ids
+        MATCH (p {id: $problem_id})
+        OPTIONAL MATCH (p)-[algorithm_rel]->(algo)
+        WHERE type(algorithm_rel) = 'HAS_ALGORITHM'
+        WITH p, head(collect(DISTINCT algo.id)) AS algorithm_id
+        OPTIONAL MATCH (p)-[bug_rel]->(bug)
+        WHERE type(bug_rel) = 'HAS_COMMON_BUG'
+        RETURN algorithm_id AS algorithm_id,
+               [bug_id IN collect(DISTINCT bug.id) WHERE bug_id IS NOT NULL] AS bug_ids
         """
         with self._session() as session:
             record = session.run(query, problem_id=problem_id).single()
-            if not record:
-                return []
-            return [
-                RuleHit(
-                    rule_id=f'rule.problem.{record["algorithm_id"]}',
-                    bug_ids=list(record['bug_ids']),
-                    matched_evidence_ids=[],
-                    matched_concept_ids=[record['algorithm_id']],
-                    confidence=0.75,
-                )
-            ]
+        if record and record['algorithm_id']:
+            algorithm_id = record['algorithm_id']
+            bug_ids = list(record['bug_ids'] or [])
+            if bug_ids:
+                return [RuleHit(f'rule.problem.{algorithm_id}', bug_ids, [], [algorithm_id], 0.75)]
+        info = InMemoryGraphRepository.PROBLEM_RULES.get(problem_id)
+        if not info:
+            return []
+        return [RuleHit(f'rule.problem.{info["algorithm"]}', list(info['bugs']), [], [info['algorithm']], 0.75)]
 
     def select_explanation(self, bug_id: str, rule_ids: List[str], concept_ids: List[str]) -> Optional[ExplanationSelection]:
         query = """

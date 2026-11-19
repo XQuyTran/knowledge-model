@@ -2,7 +2,7 @@ from neo4j import GraphDatabase
 
 from diagnostic_pipeline import DiagnosticPipeline, DiagnosticRequest, TestCase
 from diagnostic_pipeline.graph_repository import Neo4jGraphRepository
-from diagnostic_pipeline.llm_client import OpenAICompatibleLLMClient
+from diagnostic_pipeline.llm_client import build_llm_client_from_env
 
 
 def main() -> None:
@@ -12,11 +12,9 @@ def main() -> None:
     )
     try:
         graph_repository = Neo4jGraphRepository(driver=driver, database='neo4j')
-        llm_client = OpenAICompatibleLLMClient(
-            api_base_url='https://api.openai.com/v1',
-            api_key='YOUR_API_KEY',
-            model='gpt-4.1-mini',
-        )
+        # Configure via env: OPENAI_API_KEY/OPENAI_BASE_URL (or LLM_API_KEY/LLM_API_BASE_URL)
+        # plus OPENAI_MODEL/LLM_MODEL, or the AZURE_OPENAI_* variables.
+        llm_client = build_llm_client_from_env()
         pipeline = DiagnosticPipeline(graph_repository=graph_repository, llm_client=llm_client)
 
         source_code = """

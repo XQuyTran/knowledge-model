@@ -1,24 +1,21 @@
 services:
   neo4j:
-    image: neo4j:2026.05.0
+    image: neo4j:latest
     container_name: neo4j-diagnostic
     restart: unless-stopped
     environment:
-      NEO4J_USER: ${NEO4J_USER:-neo4j}
-      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
-      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD:-password}
-      NEO4J_server_memory_heap_initial__size: ${NEO4J_HEAP_INITIAL:-512M}
-      NEO4J_server_memory_heap_max__size: ${NEO4J_HEAP_MAX:-1G}
-      NEO4J_server_memory_pagecache_size: ${NEO4J_PAGECACHE:-512M}
-    ports: ["7474:7474", "7687:7687"]
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD}
+    ports: 
+      - "7474:7474"
+      - "7687:7687"
     volumes:
       - neo4j_data:/data
       - neo4j_logs:/logs
       - neo4j_conf:/conf
-      - ./neo4j-import:/import
-    networks: [diagnostic-net]
+    networks: 
+      - diagnostic-net
     healthcheck:
-      test: ["CMD-SHELL", "cypher-shell -a bolt://localhost:7687 -u \"$$NEO4J_USER\" -p \"$$NEO4J_PASSWORD\" \"RETURN 1;\" >/dev/null 2>&1 || exit 1"]
+      test: ["CMD-SHELL", "cypher-shell -a neo4j://localhost:7687 RETURN 1; >/dev/null 2>&1 || exit 1"]
       interval: 10s
       timeout: 10s
       retries: 30
@@ -28,23 +25,25 @@ services:
     pids_limit: ${NEO4J_PIDS_LIMIT:-512}
 
   neo4j-seed:
-    image: neo4j:2026.05.0
+    image: neo4j:latest
     container_name: neo4j-diagnostic-seed
+    profiles:
+      - seed
     depends_on:
       neo4j:
         condition: service_healthy
-    profiles: ["seed"]
     restart: "no"
     working_dir: /workspace
     entrypoint: ["/bin/bash", "/workspace/load_neo4j_seed.sh"]
     environment:
-      NEO4J_URI: bolt://neo4j:7687
-      NEO4J_USER: ${NEO4J_USER:-neo4j}
-      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
+      NEO4J_URI: neo4j://neo4j:7687
+      NEO4J_USERNAME: ${NEO4J_USER:-neo4j}
+      NEO4J_PASSWORD: ${NEO4J_PASSWORD}
       NEO4J_DATABASE: ${NEO4J_DATABASE:-neo4j}
     volumes:
       - ./:/workspace:ro
-    networks: [diagnostic-net]
+    networks: 
+      - diagnostic-net
     mem_limit: ${SEED_MEM_LIMIT:-512m}
     cpus: ${SEED_CPU_LIMIT:-0.5}
     pids_limit: ${SEED_PIDS_LIMIT:-128}
@@ -54,7 +53,7 @@ services:
       context: .
       dockerfile: ${APP_DOCKERFILE:-Dockerfile}
     image: ${APP_IMAGE:-diagnostic-pipeline-app:local}
-    container_name: diagnostic-pipeline-app
+    container_name: diagnostic-app
     restart: unless-stopped
     depends_on:
       neo4j:
@@ -65,15 +64,15 @@ services:
     environment:
       PYTHONUNBUFFERED: "1"
       USE_NEO4J: ${USE_NEO4J:-true}
-      NEO4J_URI: bolt://neo4j:7687
+      NEO4J_URI: neo4j://neo4j:7687
       NEO4J_DATABASE: ${NEO4J_DATABASE:-neo4j}
-      NEO4J_USER: ${NEO4J_USER:-neo4j}
-      NEO4J_PASSWORD: ${NEO4J_PASSWORD:-password}
+      NEO4J_AUTH: ${NEO4J_USER:-neo4j}/${NEO4J_PASSWORD}
     ports:
-      - "${APP_PORT:-8000}:8000"
-    networks: [diagnostic-net]
+      - "${APP_PORT:-8000}:${APP_PORT:-8000}"
+    networks: 
+      - diagnostic-net
     tmpfs:
-      - /tmp:size=256m,nosuid,nodev
+      - /tmp:size=256m,nosuid,nodev,exec
       - /workspace:size=256m,nosuid,nodev
     security_opt:
       - no-new-privileges:true
@@ -92,7 +91,6 @@ services:
 
 networks:
   diagnostic-net:
-    driver: bridge
 
 volumes:
   neo4j_data:

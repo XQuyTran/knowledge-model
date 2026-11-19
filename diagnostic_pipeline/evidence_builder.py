@@ -24,6 +24,16 @@ EVIDENCE_TO_CONCEPTS = {
     'ev.format.printf_type_mismatch': ['concept.c.formatted_io', 'concept.cpp.format', 'concept.cpp.print_functions'],
     'ev.compile.error': ['concept.c.syntax', 'concept.cpp.compilation'],
     'ev.uninitialized.value': ['concept.c.variable', 'concept.cpp.initialization'],
+    'ev.memory.static_leak': ['concept.memory', 'concept.resource_lifecycle'],
+    'ev.loop.timeout': ['concept.loop.control'],
+    'ev.recursion.stack_overflow': ['concept.recursion', 'concept.recursion.base_case'],
+    'ev.sort.insertion.pattern': ['algorithm.insertion_sort', 'concept.sort.insertion', 'concept.loop.nested'],
+    'ev.sort.insertion.missed_zero_index': ['algorithm.insertion_sort', 'concept.loop.boundary'],
+    'ev.sort.insertion.wrong_insert_position': ['algorithm.insertion_sort', 'concept.array.indexing'],
+    'ev.sort.insertion.missing_decrement': ['algorithm.insertion_sort', 'concept.loop.control'],
+    'ev.sort.bubble.pattern': ['algorithm.bubble_sort', 'concept.sort.bubble', 'concept.loop.nested'],
+    'ev.sort.bubble.wrong_order': ['algorithm.bubble_sort', 'concept.sort.ordering'],
+    'ev.search.binary.pattern': ['algorithm.tim_kiem_nhi_phan', 'concept.search.binary']
 }
 
 
